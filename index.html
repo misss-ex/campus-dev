@@ -137,6 +137,7 @@
   .group-card .gt .sub2 { color: var(--faint); }
   .soon { flex: none; font-size: 11px; font-weight: 700; color: var(--muted); padding: 4px 9px; border-radius: 999px; background: var(--line); }
   .group-card.off { cursor: default; }
+  .eyebrow.back { color: var(--accent); font-size: 13px; padding: 8px 12px 8px 0; margin: -8px 0; }
   .group-card.off .avatar { background: var(--line); color: var(--muted); }
   .favs { display: flex; flex-wrap: wrap; gap: 6px; }
   .fav { display: inline-flex; align-items: center; height: 36px; border-radius: 999px; background: var(--card); border: 1px solid var(--line); font-size: 13px; font-weight: 700; }
@@ -218,9 +219,12 @@
   </section>
 
   <section id="v-services" hidden>
+    <div id="svc-home">
     <header class="top"><div><div class="eyebrow">СтГМУ</div><h1>Сервисы</h1></div></header>
-    <p class="svc-sub">Каналы с лекциями и материалами для учёбы.</p>
-    <div id="svc-res"></div>
+    <div class="cards">
+      <button class="group-card" data-sub="res"><span class="avatar"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 19V5M8 7h7"/></svg></span>
+        <span class="gt"><b>Ресурсы для учёбы</b><span id="svc-res-count">Каналы с лекциями и материалами</span></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></button>
+    </div>
     <div class="label">Скоро</div>
     <div class="cards">
       <div class="group-card off"><span class="avatar"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg></span>
@@ -229,6 +233,12 @@
         <span class="gt"><b>Сводка в чат группы</b><span>Каждый вечер — пары на завтра</span></span><span class="soon">скоро</span></div>
       <div class="group-card off"><span class="avatar"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2M5 3 2 6M19 3l3 3"/></svg></span>
         <span class="gt"><b>Напоминания о парах</b><span>За 10 минут до начала</span></span><span class="soon">скоро</span></div>
+    </div>
+    </div>
+    <div id="svc-sub-res" hidden>
+      <header class="top"><div><button class="eyebrow back" data-sub-close>‹ Сервисы</button><h1>Ресурсы</h1></div></header>
+      <p class="svc-sub">Каналы с лекциями и материалами для учёбы.</p>
+      <div id="svc-res"></div>
     </div>
   </section>
 
@@ -334,7 +344,7 @@ for (const ev of ['gesturestart', 'gesturechange']) document.addEventListener(ev
 const haptic = t => { try { t === 'sel' ? tg?.HapticFeedback?.selectionChanged() : tg?.HapticFeedback?.notificationOccurred(t); } catch {} };
 
 const S = new Schedule({ baseUrl: './data' });
-const st = { view: 'now', group: null, data: null, selDate: null, theme: 'dark', accent: 'mint', favs: [] };
+const st = { view: 'now', group: null, data: null, selDate: null, theme: 'dark', accent: 'mint', favs: [], sub: null };
 
 function applyTheme() {
   let t = st.theme;
@@ -347,14 +357,14 @@ function applyTheme() {
 try { tg?.onEvent?.('themeChanged', applyTheme); } catch {}
 
 function go(view) {
-  st.view = view;
+  st.view = view; st.sub = null;
   for (const v of ['now', 'schedule', 'services', 'settings']) { const el = $('v-' + v); el.hidden = v !== view; if (v === view) { el.classList.remove('fade'); void el.offsetWidth; el.classList.add('fade'); } }
   document.querySelectorAll('nav.tabs button').forEach(b => b.classList.toggle('sel', b.dataset.go === view));
   render();
   try { view === 'now' ? tg?.BackButton?.hide() : tg?.BackButton?.show(); } catch {}
   window.scrollTo(0, 0);
 }
-try { tg?.BackButton?.onClick(() => fbOpen ? closeFb() : sheetOpen ? closeSheet() : go('now')); } catch {}
+try { tg?.BackButton?.onClick(() => fbOpen ? closeFb() : sheetOpen ? closeSheet() : st.sub ? openSub(null) : go('now')); } catch {}
 document.addEventListener('click', e => {
   const b = e.target.closest('[data-go]'); if (b) { haptic('sel'); go(b.dataset.go); }
   if (e.target.closest('[data-open-sheet]')) openSheet();
@@ -441,11 +451,26 @@ $('sch-list').addEventListener('touchend', e => { if (tx == null) return; const 
 // ---------- сервисы: ресурсы (каналы с лекциями и материалами) — список в resources.json
 const TG_ICON = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M21 4 3 11l6 2 2 6 3-4 5 4z"/><path d="m9 13 8-6"/></svg>';
 let resources = null;
+function openSub(name) {  // подстраница «Сервисов» (пока одна — ресурсы); null — назад к списку
+  st.sub = name;
+  $('svc-home').hidden = !!name;
+  for (const el of document.querySelectorAll('[id^="svc-sub-"]')) el.hidden = el.id !== 'svc-sub-' + name;
+  window.scrollTo(0, 0);
+  renderServices();
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-sub]'); if (b) { haptic('sel'); openSub(b.dataset.sub); }
+  if (e.target.closest('[data-sub-close]')) { haptic('sel'); openSub(null); }
+});
 async function renderServices() {
+  $('svc-home').hidden = !!st.sub;
+  for (const el of document.querySelectorAll('[id^="svc-sub-"]')) el.hidden = el.id !== 'svc-sub-' + st.sub;
   if (!resources) {
     try { resources = await (await fetch('./resources.json', { cache: 'no-cache' })).json(); }
     catch { $('svc-res').innerHTML = '<div class="empty"><b>Не удалось загрузить</b>Проверьте интернет</div>'; return; }
   }
+  const n = resources.sections.reduce((k, sec) => k + sec.items.length, 0);
+  $('svc-res-count').textContent = `Каналы с лекциями и материалами · ${n} ${plural(n, 'ссылка', 'ссылки', 'ссылок')}`;
   const handle = url => { const m = url.match(/t\.me\/(\+)?([\w-]+)/); return m ? (m[1] ? 'закрытый канал' : '@' + m[2]) : url.replace(/^https?:\/\//, ''); };
   $('svc-res').innerHTML = resources.sections.map(sec => `<div class="label">${esc(sec.title)}</div><div class="cards">${
     sec.items.map(it => `<button class="group-card" data-url="${esc(it.url)}"><span class="avatar">${TG_ICON}</span>
