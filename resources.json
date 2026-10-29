@@ -1,0 +1,26 @@
+{
+  "sections": [
+    {
+      "title": "Лекции по курсам",
+      "items": [
+        { "title": "Лечебное дело · 2 курс", "url": "https://t.me/aaworurvj" },
+        { "title": "Педиатрия · 3 курс", "url": "https://t.me/pediatrylekcii" },
+        { "title": "Стоматология · 1 курс", "url": "https://t.me/stomat1st" }
+      ]
+    },
+    {
+      "title": "Анатомия · 1–2 курс",
+      "items": [
+        { "title": "Анатомия", "url": "https://t.me/anatomy_stgmy", "note": "видеоразборы" },
+        { "title": "Normal anatomy", "url": "https://t.me/normalnayanatomia", "note": "видеоразборы" }
+      ]
+    },
+    {
+      "title": "По предметам",
+      "items": [
+        { "title": "Латинский", "url": "https://t.me/lat_stgmu" },
+        { "title": "Биохимия", "url": "https://t.me/stgmy_bh" }
+      ]
+    }
+  ]
+}

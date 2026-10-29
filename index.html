@@ -134,9 +134,7 @@
   .cards { display: grid; gap: 8px; }
   /* сервисы */
   .svc-sub { font-size: 13px; color: var(--muted); margin: -10px 2px 0; }
-  .group-card .gt .subj { display: block; margin-top: 2px; font-size: 12px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .cnt { flex: none; text-align: right; font-size: 11px; color: var(--muted); line-height: 1.2; }
-  .cnt b { display: block; font-size: 17px; font-weight: 800; color: var(--text); }
+  .group-card .gt .sub2 { color: var(--faint); }
   .soon { flex: none; font-size: 11px; font-weight: 700; color: var(--muted); padding: 4px 9px; border-radius: 999px; background: var(--line); }
   .group-card.off { cursor: default; }
   .group-card.off .avatar { background: var(--line); color: var(--muted); }
@@ -221,9 +219,8 @@
 
   <section id="v-services" hidden>
     <header class="top"><div><div class="eyebrow">СтГМУ</div><h1>Сервисы</h1></div></header>
-    <p class="svc-sub">Полезное для учёбы — пополняется.</p>
-    <div class="label">Мои корпуса</div>
-    <div class="cards" id="svc-places"></div>
+    <p class="svc-sub">Каналы с лекциями и материалами для учёбы.</p>
+    <div id="svc-res"></div>
     <div class="label">Скоро</div>
     <div class="cards">
       <div class="group-card off"><span class="avatar"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg></span>
@@ -441,35 +438,26 @@ let tx = null;
 $('sch-list').addEventListener('touchstart', e => { tx = e.touches[0].clientX; }, { passive: true });
 $('sch-list').addEventListener('touchend', e => { if (tx == null) return; const dx = e.changedTouches[0].clientX - tx; tx = null; if (Math.abs(dx) > 60) { st.selDate = addDays(st.selDate || moscowNow().iso, dx < 0 ? 1 : -1); renderSchedule(); } });
 
-// ---------- сервисы: корпуса группы из адресов в расписании (в данных ~170 вариантов записи адреса)
-const ADDR = /(?:ул\.|пр\.|пл\.)\s*[^,;]+?,\s*\d+(?:-?[а-яё])?(?:\/\d+)?|Старомарьевское шоссе,\s*\d+/i;
-const addrOf = room => (room || '').split(/\s*;\s*|\s+\/\s+/)
-  .map(part => part.match(ADDR)?.[0].replace(/(\d)-([а-яё])/i, '$1$2').replace(/(\d)([А-ЯЁ])$/, (m, d, l) => d + l.toLowerCase()))
-  .filter(Boolean);
-function renderServices() {
-  const today = moscowNow().iso, places = new Map();
-  for (const ev of st.data.events) {
-    const left = ev.dates.filter(d => d >= today).length;
-    for (const a of new Set(addrOf(ev.room))) {
-      const p = places.get(a) || { addr: a, left: 0, subj: new Map() };
-      p.left += left;
-      if (left) p.subj.set(ev.subject, (p.subj.get(ev.subject) || 0) + left);
-      places.set(a, p);
-    }
+// ---------- сервисы: ресурсы (каналы с лекциями и материалами) — список в resources.json
+const TG_ICON = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M21 4 3 11l6 2 2 6 3-4 5 4z"/><path d="m9 13 8-6"/></svg>';
+let resources = null;
+async function renderServices() {
+  if (!resources) {
+    try { resources = await (await fetch('./resources.json', { cache: 'no-cache' })).json(); }
+    catch { $('svc-res').innerHTML = '<div class="empty"><b>Не удалось загрузить</b>Проверьте интернет</div>'; return; }
   }
-  const list = [...places.values()].filter(p => p.left).sort((a, b) => b.left - a.left);
-  $('svc-places').innerHTML = list.length ? list.map(p => {
-    const subj = [...p.subj].sort((a, b) => b[1] - a[1]).map(x => x[0]);
-    return `<button class="group-card" data-map="${esc(p.addr)}"><span class="avatar">${PIN}</span>
-      <span class="gt"><b>${esc(p.addr)}</b><span class="subj">${esc(subj.slice(0, 2).join(' · '))}${subj.length > 2 ? ` и ещё ${subj.length - 2}` : ''}</span></span>
-      <span class="cnt num"><b>${p.left}</b>${plural(p.left, 'занятие', 'занятия', 'занятий')}</span></button>`;
-  }).join('') : '<div class="empty"><b>Занятий больше нет</b>Семестр закончился</div>';
+  const handle = url => { const m = url.match(/t\.me\/(\+)?([\w-]+)/); return m ? (m[1] ? 'закрытый канал' : '@' + m[2]) : url.replace(/^https?:\/\//, ''); };
+  $('svc-res').innerHTML = resources.sections.map(sec => `<div class="label">${esc(sec.title)}</div><div class="cards">${
+    sec.items.map(it => `<button class="group-card" data-url="${esc(it.url)}"><span class="avatar">${TG_ICON}</span>
+      <span class="gt"><b>${esc(it.title)}</b><span>${esc(handle(it.url))}${it.note ? ` <span class="sub2">· ${esc(it.note)}</span>` : ''}</span></span>
+      <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></button>`).join('')
+  }</div>`).join('');
 }
-$('svc-places').onclick = e => {
-  const b = e.target.closest('[data-map]'); if (!b) return;
-  const url = `https://yandex.ru/maps/?text=${encodeURIComponent('Ставрополь, ' + b.dataset.map)}`;
-  haptic('sel');
-  if (tg?.openLink) tg.openLink(url); else window.open(url, '_blank');
+$('svc-res').onclick = e => {
+  const b = e.target.closest('[data-url]'); if (!b) return;
+  const url = b.dataset.url; haptic('sel');
+  if (/^https:\/\/t\.me\//.test(url) && tg?.openTelegramLink) tg.openTelegramLink(url);
+  else if (tg?.openLink) tg.openLink(url); else window.open(url, '_blank');
 };
 
 function groupInfo(id) { return S.listGroups().find(x => x.id === id); }
