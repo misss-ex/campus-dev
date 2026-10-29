@@ -693,7 +693,9 @@ function toast(text) {
 function openBotFallback(kind) {  // временно, пока у бота нет публичного адреса: заявка через чат бота
   const slug = groupInfo(st.group)?.slug;
   const link = `https://t.me/${BOT}?start=${kind}${slug && kind === 'report' ? '_' + slug : ''}`;
-  if (tg?.openTelegramLink) tg.openTelegramLink(link); else window.open(link, '_blank');
+  if (!tg?.openTelegramLink) { window.open(link, '_blank'); return; }
+  tg.openTelegramLink(link);
+  setTimeout(() => { try { tg.close(); } catch {} }, 300);  // в полноэкранном режиме чат иначе остаётся под приложением
 }
 document.addEventListener('click', e => {
   const b = e.target.closest('[data-fb]'); if (!b) return;
