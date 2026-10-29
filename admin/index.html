@@ -99,7 +99,7 @@
     <button data-t="stats" class="sel">Аналитика</button><button data-t="reports">Заявки</button><button data-t="ideas">Идеи</button><button data-t="users">Люди</button>
   </div>
   <section id="t-stats">
-    <div class="seg small" id="period"><button data-d="1">Сегодня</button><button data-d="7" class="sel">7 дней</button><button data-d="30">30 дней</button><button data-d="90">90 дней</button></div>
+    <div class="seg small" id="period"><button data-d="1">Сегодня</button><button data-d="7" class="sel">7 дней</button><button data-d="30">30 дней</button><button data-d="90">90 дней</button><button data-d="0">Всё время</button></div>
     <div id="stats"></div>
   </section>
   <section id="t-reports" hidden>
@@ -133,7 +133,7 @@ async function api(action, body = {}) {
   if (st.demo) {
     st.demoData ||= await (await fetch('./demo.json', { cache: 'no-cache' })).json();
     if (action === 'close') return { closed: true };
-    if (action === 'stats') return st.demoData.stats[body.days];
+    if (action === 'stats') return st.demoData.stats[body.days] || { ...st.demoData.stats[90], all_time: true };
     return action === 'reports' ? st.demoData[body.kind === 'idea' ? 'ideas' : 'reports'].filter(r => body.kind === 'idea' || !body.open || r.status === 'open')
          : st.demoData[action];
   }
@@ -215,7 +215,7 @@ async function renderStats() {
     ${card('По дням недели', vbars(m.wdays, wd))}
     ${m.errors.length ? card('⚠️ Ошибки в приложении', hbars(m.errors)) : ''}
     ${card('Бот', hbars([['/start', m.bot_starts], ['Заявки', m.reports], ['Идеи', m.ideas]]))}
-    <div class="foot num">Событий за период: ${m.events} · без твоих действий</div>`;
+    <div class="foot num">${m.all_time ? `С ${days[0]} · ` : ''}Событий за период: ${m.events} · без твоих действий</div>`;
 }
 function reportItem(r, idea) {
   const status = idea ? '' : `<span class="tag ${r.status}">${{ open: 'открыта', done: 'исправлено', rejected: 'не ошибка' }[r.status]}</span>`;
