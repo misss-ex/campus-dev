@@ -132,6 +132,14 @@
   .swatch.sel { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
   .about { margin-top: 26px; text-align: center; font-size: 12px; color: var(--faint); }
   .cards { display: grid; gap: 8px; }
+  /* сервисы */
+  .svc-sub { font-size: 13px; color: var(--muted); margin: -10px 2px 0; }
+  .group-card .gt .subj { display: block; margin-top: 2px; font-size: 12px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .cnt { flex: none; text-align: right; font-size: 11px; color: var(--muted); line-height: 1.2; }
+  .cnt b { display: block; font-size: 17px; font-weight: 800; color: var(--text); }
+  .soon { flex: none; font-size: 11px; font-weight: 700; color: var(--muted); padding: 4px 9px; border-radius: 999px; background: var(--line); }
+  .group-card.off { cursor: default; }
+  .group-card.off .avatar { background: var(--line); color: var(--muted); }
   .favs { display: flex; flex-wrap: wrap; gap: 6px; }
   .fav { display: inline-flex; align-items: center; height: 36px; border-radius: 999px; background: var(--card); border: 1px solid var(--line); font-size: 13px; font-weight: 700; }
   .fav > button { height: 100%; padding: 0 12px; }
@@ -171,7 +179,7 @@
 
   /* tab bar */
   nav.tabs { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; padding-top: 8px; padding-bottom: max(10px, calc(var(--sb) - 14px)); padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); pointer-events: none; }
-  nav.tabs .in { pointer-events: auto; max-width: 360px; margin: 0 auto; display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; padding: 6px; border-radius: 22px; background: color-mix(in srgb, var(--card) 82%, transparent); backdrop-filter: blur(16px) saturate(1.4); -webkit-backdrop-filter: blur(16px) saturate(1.4); border: 1px solid var(--line-2); box-shadow: var(--shadow); }
+  nav.tabs .in { pointer-events: auto; max-width: 400px; margin: 0 auto; display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; padding: 6px; border-radius: 22px; background: color-mix(in srgb, var(--card) 82%, transparent); backdrop-filter: blur(16px) saturate(1.4); -webkit-backdrop-filter: blur(16px) saturate(1.4); border: 1px solid var(--line-2); box-shadow: var(--shadow); }
   nav.tabs button { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 7px 0; border-radius: 16px; font-size: 11px; font-weight: 700; color: var(--muted); transition: background .2s, color .2s; }
   nav.tabs button svg { width: 21px; height: 21px; }
   nav.tabs button.sel { background: var(--accent-soft); color: var(--accent); }
@@ -209,6 +217,22 @@
     <div class="days" id="sch-days"></div>
     <div class="section"><h3 id="sch-title"></h3><span id="sch-count"></span></div>
     <div class="list" id="sch-list"></div>
+  </section>
+
+  <section id="v-services" hidden>
+    <header class="top"><div><div class="eyebrow">СтГМУ</div><h1>Сервисы</h1></div></header>
+    <p class="svc-sub">Полезное для учёбы — пополняется.</p>
+    <div class="label">Мои корпуса</div>
+    <div class="cards" id="svc-places"></div>
+    <div class="label">Скоро</div>
+    <div class="cards">
+      <div class="group-card off"><span class="avatar"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg></span>
+        <span class="gt"><b>Расписание в любом чате</b><span>Наберите @stgmu_helpbot и номер группы</span></span><span class="soon">скоро</span></div>
+      <div class="group-card off"><span class="avatar"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 1 6 6c0 5 2 6 2 6H4s2-1 2-6a6 6 0 0 1 6-6z"/><path d="M10 19a2 2 0 0 0 4 0"/></svg></span>
+        <span class="gt"><b>Сводка в чат группы</b><span>Каждый вечер — пары на завтра</span></span><span class="soon">скоро</span></div>
+      <div class="group-card off"><span class="avatar"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2M5 3 2 6M19 3l3 3"/></svg></span>
+        <span class="gt"><b>Напоминания о парах</b><span>За 10 минут до начала</span></span><span class="soon">скоро</span></div>
+    </div>
   </section>
 
   <section id="v-settings" hidden>
@@ -281,6 +305,7 @@
 <nav class="tabs"><div class="in">
   <button data-go="now"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Сейчас</button>
   <button data-go="schedule"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="4"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Расписание</button>
+  <button data-go="services"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="6.5" height="6.5" rx="2"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="2"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="2"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="2"/></svg>Сервисы</button>
   <button data-go="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>Настройки</button>
 </div></nav>
 
@@ -326,7 +351,7 @@ try { tg?.onEvent?.('themeChanged', applyTheme); } catch {}
 
 function go(view) {
   st.view = view;
-  for (const v of ['now', 'schedule', 'settings']) { const el = $('v-' + v); el.hidden = v !== view; if (v === view) { el.classList.remove('fade'); void el.offsetWidth; el.classList.add('fade'); } }
+  for (const v of ['now', 'schedule', 'services', 'settings']) { const el = $('v-' + v); el.hidden = v !== view; if (v === view) { el.classList.remove('fade'); void el.offsetWidth; el.classList.add('fade'); } }
   document.querySelectorAll('nav.tabs button').forEach(b => b.classList.toggle('sel', b.dataset.go === view));
   render();
   try { view === 'now' ? tg?.BackButton?.hide() : tg?.BackButton?.show(); } catch {}
@@ -342,6 +367,7 @@ function render() {
   if (!st.data) return;
   if (st.view === 'now') renderNow();
   if (st.view === 'schedule') renderSchedule();
+  if (st.view === 'services') renderServices();
   if (st.view === 'settings') renderSettings();
 }
 
@@ -414,6 +440,37 @@ $('sch-today').onclick = () => { st.selDate = null; renderSchedule(); };
 let tx = null;
 $('sch-list').addEventListener('touchstart', e => { tx = e.touches[0].clientX; }, { passive: true });
 $('sch-list').addEventListener('touchend', e => { if (tx == null) return; const dx = e.changedTouches[0].clientX - tx; tx = null; if (Math.abs(dx) > 60) { st.selDate = addDays(st.selDate || moscowNow().iso, dx < 0 ? 1 : -1); renderSchedule(); } });
+
+// ---------- сервисы: корпуса группы из адресов в расписании (в данных ~170 вариантов записи адреса)
+const ADDR = /(?:ул\.|пр\.|пл\.)\s*[^,;]+?,\s*\d+(?:-?[а-яё])?(?:\/\d+)?|Старомарьевское шоссе,\s*\d+/i;
+const addrOf = room => (room || '').split(/\s*;\s*|\s+\/\s+/)
+  .map(part => part.match(ADDR)?.[0].replace(/(\d)-([а-яё])/i, '$1$2').replace(/(\d)([А-ЯЁ])$/, (m, d, l) => d + l.toLowerCase()))
+  .filter(Boolean);
+function renderServices() {
+  const today = moscowNow().iso, places = new Map();
+  for (const ev of st.data.events) {
+    const left = ev.dates.filter(d => d >= today).length;
+    for (const a of new Set(addrOf(ev.room))) {
+      const p = places.get(a) || { addr: a, left: 0, subj: new Map() };
+      p.left += left;
+      if (left) p.subj.set(ev.subject, (p.subj.get(ev.subject) || 0) + left);
+      places.set(a, p);
+    }
+  }
+  const list = [...places.values()].filter(p => p.left).sort((a, b) => b.left - a.left);
+  $('svc-places').innerHTML = list.length ? list.map(p => {
+    const subj = [...p.subj].sort((a, b) => b[1] - a[1]).map(x => x[0]);
+    return `<button class="group-card" data-map="${esc(p.addr)}"><span class="avatar">${PIN}</span>
+      <span class="gt"><b>${esc(p.addr)}</b><span class="subj">${esc(subj.slice(0, 2).join(' · '))}${subj.length > 2 ? ` и ещё ${subj.length - 2}` : ''}</span></span>
+      <span class="cnt num"><b>${p.left}</b>${plural(p.left, 'занятие', 'занятия', 'занятий')}</span></button>`;
+  }).join('') : '<div class="empty"><b>Занятий больше нет</b>Семестр закончился</div>';
+}
+$('svc-places').onclick = e => {
+  const b = e.target.closest('[data-map]'); if (!b) return;
+  const url = `https://yandex.ru/maps/?text=${encodeURIComponent('Ставрополь, ' + b.dataset.map)}`;
+  haptic('sel');
+  if (tg?.openLink) tg.openLink(url); else window.open(url, '_blank');
+};
 
 function groupInfo(id) { return S.listGroups().find(x => x.id === id); }
 function renderSettings() {
