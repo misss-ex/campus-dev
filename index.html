@@ -137,6 +137,21 @@
   .group-card .gt .sub2 { color: var(--faint); }
   .soon { flex: none; font-size: 11px; font-weight: 700; color: var(--muted); padding: 4px 9px; border-radius: 999px; background: var(--line); }
   .group-card.off { cursor: default; }
+  /* семестр в цифрах */
+  .ptrack { height: 10px; border-radius: 10px; background: var(--line-2); overflow: hidden; margin: 14px 0 8px; }
+  .ptrack i { display: block; height: 100%; border-radius: 10px; background: var(--accent); box-shadow: 0 0 12px var(--glow); }
+  .big-pct { font-size: 44px; font-weight: 800; letter-spacing: -.03em; line-height: 1; }
+  .big-pct small { font-size: 15px; font-weight: 700; color: var(--muted); letter-spacing: 0; margin-left: 6px; }
+  .tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .tile { padding: 14px; border-radius: var(--r-md); background: var(--card); border: 1px solid var(--line); }
+  .tile b { display: block; font-size: 24px; font-weight: 800; letter-spacing: -.02em; }
+  .tile span { font-size: 12px; color: var(--muted); line-height: 1.3; display: block; margin-top: 2px; }
+  .bars { display: grid; gap: 12px; padding: 14px; border-radius: var(--r-md); background: var(--card); border: 1px solid var(--line); }
+  .bar-row .bt { display: flex; justify-content: space-between; gap: 10px; font-size: 13px; font-weight: 700; margin-bottom: 5px; }
+  .bar-row .bt span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .bar-row .bt em { flex: none; font-style: normal; font-size: 12px; color: var(--muted); font-weight: 600; }
+  .bar-row .track { height: 6px; border-radius: 6px; background: var(--line); overflow: hidden; }
+  .bar-row .track i { display: block; height: 100%; border-radius: 6px; background: var(--tc); }
   .eyebrow.back { color: var(--accent); font-size: 13px; padding: 8px 12px 8px 0; margin: -8px 0; }
   .group-card.off .avatar { background: var(--line); color: var(--muted); }
   .favs { display: flex; flex-wrap: wrap; gap: 6px; }
@@ -224,6 +239,8 @@
     <div class="cards">
       <button class="group-card" data-sub="res"><span class="avatar"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 19V5M8 7h7"/></svg></span>
         <span class="gt"><b>Ресурсы для учёбы</b><span id="svc-res-count">Каналы с лекциями и материалами</span></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></button>
+      <button class="group-card" data-sub="stats"><span class="avatar"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></span>
+        <span class="gt"><b>Семестр в цифрах</b><span id="svc-stats-sub">Сколько позади и сколько осталось</span></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></button>
     </div>
     <div class="label">Скоро</div>
     <div class="cards">
@@ -234,6 +251,10 @@
       <div class="group-card off"><span class="avatar"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2M5 3 2 6M19 3l3 3"/></svg></span>
         <span class="gt"><b>Напоминания о парах</b><span>За 10 минут до начала</span></span><span class="soon">скоро</span></div>
     </div>
+    </div>
+    <div id="svc-sub-stats" hidden>
+      <header class="top"><div><button class="eyebrow back" data-sub-close>‹ Сервисы</button><h1>Семестр в цифрах</h1></div></header>
+      <div id="svc-stats"></div>
     </div>
     <div id="svc-sub-res" hidden>
       <header class="top"><div><button class="eyebrow back" data-sub-close>‹ Сервисы</button><h1>Ресурсы</h1></div></header>
@@ -317,7 +338,7 @@
 </div></nav>
 
 <script type="module">
-import { Schedule, prefs, moscowNow, formatDayTitle, formatMonth, addDays, mondayOf, studyWeek } from './schedule.js';
+import { Schedule, prefs, moscowNow, formatDayTitle, formatMonth, addDays, mondayOf, studyWeek, toMin, weekday, WEEKDAYS_FULL } from './schedule.js';
 
 const tg = window.Telegram?.WebApp;
 const BOT = 'stgmu_helpbot';
@@ -451,7 +472,69 @@ $('sch-list').addEventListener('touchend', e => { if (tx == null) return; const 
 // ---------- сервисы: ресурсы (каналы с лекциями и материалами) — список в resources.json
 const TG_ICON = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M21 4 3 11l6 2 2 6 3-4 5 4z"/><path d="m9 13 8-6"/></svg>';
 let resources = null;
-function openSub(name) {  // подстраница «Сервисов» (пока одна — ресурсы); null — назад к списку
+// ---------- семестр в цифрах: всё считается из расписания группы, без сервера
+function semesterStats(data, today) {
+  const subj = new Map(), days = new Map(), byWd = new Map();
+  let total = 0, done = 0, minDone = 0, last = '';
+  for (const ev of data.events) {
+    const dur = toMin(ev.end) - toMin(ev.start);
+    const sj = subj.get(ev.subject) || { n: 0, left: 0, type: ev.type };
+    for (const d of ev.dates) {
+      total++; sj.n++; if (d > last) last = d;
+      if (d < today) { done++; minDone += dur; } else sj.left++;
+      const day = days.get(d) || { n: 0, first: 1e4, end: 0 };
+      day.n++; day.first = Math.min(day.first, toMin(ev.start)); day.end = Math.max(day.end, toMin(ev.end));
+      days.set(d, day);
+    }
+    subj.set(ev.subject, sj);
+  }
+  for (const [d, day] of days) { const w = byWd.get(weekday(d)) || { pairs: 0, dates: 0 }; w.pairs += day.n; w.dates++; byWd.set(weekday(d), w); }
+  const busiest = [...byWd].sort((a, b) => b[1].pairs / b[1].dates - a[1].pairs / a[1].dates)[0];
+  const longest = [...days].sort((a, b) => (b[1].end - b[1].first) - (a[1].end - a[1].first))[0];
+  const sem = data.semester || S.index.semester;
+  const span = (Date.parse(sem.end) - Date.parse(sem.start)) || 1;
+  return {
+    total, done, left: total - done, hoursDone: Math.round(minDone / 60), last,
+    pct: Math.max(0, Math.min(100, Math.round((Date.parse(today) - Date.parse(sem.start)) / span * 100))),
+    studyDays: days.size, daysLeft: [...days.keys()].filter(d => d >= today).length,
+    early: [...days].filter(([d, x]) => d >= today && x.first <= 8 * 60).length,
+    subjects: [...subj].map(([name, x]) => ({ name, ...x })).sort((a, b) => b.n - a.n),
+    busiest: busiest && { name: WEEKDAYS_FULL[busiest[0] - 1], avg: busiest[1].pairs / busiest[1].dates },
+    longest: longest && { date: longest[0], from: longest[1].first, to: longest[1].end, n: longest[1].n },
+  };
+}
+const hhmm = m => `${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`;
+function renderStats() {
+  const x = semesterStats(st.data, moscowNow().iso);
+  $('svc-stats-sub').textContent = `${x.pct}% семестра позади · осталось ${x.left} ${plural(x.left, 'пара', 'пары', 'пар')}`;
+  if (st.sub !== 'stats') return;
+  const max = x.subjects[0]?.n || 1;
+  const pairs = n => `${n} ${plural(n, 'пара', 'пары', 'пар')}`;
+  $('svc-stats').innerHTML = `
+    <div class="hero"><span class="status"><i class="live"></i>${esc(st.group)} · ${esc(S.index.semester.title)}</span>
+      <div class="big-pct num" style="margin-top:14px">${x.pct}%<small>семестра позади</small></div>
+      <div class="ptrack"><i style="width:${x.pct}%"></i></div>
+      ${x.last ? `<div class="meta">Последняя пара — ${esc(formatDayTitle(x.last).toLowerCase())}</div>` : ''}</div>
+    <div class="section"><h3>Цифры</h3><span>на сегодня</span></div>
+    <div class="tiles num">
+      <div class="tile"><b>${x.done}</b><span>${plural(x.done, 'пара позади', 'пары позади', 'пар позади')}</span></div>
+      <div class="tile"><b>${x.left}</b><span>${plural(x.left, 'пара осталась', 'пары осталось', 'пар осталось')}</span></div>
+      <div class="tile"><b>${x.hoursDone} ч</b><span>уже отсижено на парах</span></div>
+      <div class="tile"><b>${x.daysLeft}</b><span>${plural(x.daysLeft, 'учебный день', 'учебных дня', 'учебных дней')} впереди</span></div>
+    </div>
+    <div class="section"><h3>Предметы</h3><span>всего / осталось</span></div>
+    <div class="bars">${x.subjects.slice(0, 6).map(sj => `<div class="bar-row" style="--tc:${typeColor(sj.type)}">
+      <div class="bt"><span>${esc(sj.name)}</span><em class="num">${sj.n} / ${sj.left}</em></div>
+      <div class="track"><i style="width:${(sj.n / max * 100).toFixed(1)}%"></i></div></div>`).join('')}</div>
+    <div class="section"><h3>Факты</h3><span></span></div>
+    <div class="cards">
+      ${x.busiest ? `<div class="group-card"><span class="avatar">📅</span><span class="gt"><b>${esc(x.busiest.name)}</b><span>самый загруженный день — в среднем ${x.busiest.avg.toFixed(1).replace('.', ',')} пары</span></span></div>` : ''}
+      ${x.longest ? `<div class="group-card"><span class="avatar">⏳</span><span class="gt"><b>${esc(formatDayTitle(x.longest.date))}</b><span>самый длинный день: ${hhmm(x.longest.from)}–${hhmm(x.longest.to)}, ${pairs(x.longest.n)}</span></span></div>` : ''}
+      <div class="group-card"><span class="avatar">⏰</span><span class="gt"><b>${x.early} ${plural(x.early, 'раз', 'раза', 'раз')}</b><span>ещё вставать к первой паре в 8:00 или раньше</span></span></div>
+    </div>`;
+}
+
+function openSub(name) {  // подстраница «Сервисов»; null — назад к списку
   st.sub = name;
   $('svc-home').hidden = !!name;
   for (const el of document.querySelectorAll('[id^="svc-sub-"]')) el.hidden = el.id !== 'svc-sub-' + name;
@@ -463,6 +546,7 @@ document.addEventListener('click', e => {
   if (e.target.closest('[data-sub-close]')) { haptic('sel'); openSub(null); }
 });
 async function renderServices() {
+  renderStats();
   $('svc-home').hidden = !!st.sub;
   for (const el of document.querySelectorAll('[id^="svc-sub-"]')) el.hidden = el.id !== 'svc-sub-' + st.sub;
   if (!resources) {
