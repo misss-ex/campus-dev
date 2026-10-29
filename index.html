@@ -367,6 +367,34 @@ const haptic = t => { try { t === 'sel' ? tg?.HapticFeedback?.selectionChanged()
 const S = new Schedule({ baseUrl: './data' });
 const st = { view: 'now', group: null, data: null, selDate: null, theme: 'dark', accent: 'mint', favs: [], sub: null };
 
+// ---------- аналитика: события копим и шлём пачкой на сервер бота (рядом с формой: …/api/event).
+// Подпись initData проверяет сервер, поэтому кто прислал — известно, а подделать нельзя.
+// Пока FEEDBACK_API пустой (нет VPS), события никуда не уходят.
+const AQ = [];
+let aSession = Date.now();
+function track(n, p = {}) {
+  const g = st.group ? groupInfo(st.group)?.slug : null;
+  AQ.push({ n, t: Date.now(), p: g && !('g' in p) ? { ...p, g } : p });
+  if (AQ.length >= 20) flush();
+}
+function flush(beacon = false) {
+  if (!AQ.length) return;
+  let api = '';
+  try { api = FEEDBACK_API.replace(/\/feedback$/, '/event'); } catch {}  // FEEDBACK_API объявлен ниже
+  if (!api || !tg?.initData) { const ev = AQ.splice(0); if (/localhost|127\.0\.0\.1/.test(location.host)) console.debug('analytics', ev); return; }
+  const body = JSON.stringify({ initData: tg.initData, meta: { platform: tg.platform, version: tg.version }, events: AQ.splice(0) });
+  // text/plain — без лишнего CORS-запроса; sendBeacon доставит, даже если приложение уже закрывается
+  if (beacon && navigator.sendBeacon) navigator.sendBeacon(api, new Blob([body], { type: 'text/plain' }));
+  else fetch(api, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body, keepalive: true }).catch(() => {});
+}
+setInterval(flush, 15000);
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) { track('session_end', { s: Math.round((Date.now() - aSession) / 1000) }); flush(true); }
+  else { aSession = Date.now(); track('resume'); }
+});
+window.addEventListener('error', e => track('js_error', { msg: String(e.message).slice(0, 200), at: `${(e.filename || '').split('/').pop()}:${e.lineno}` }));
+window.addEventListener('unhandledrejection', e => track('js_error', { msg: String(e.reason?.message || e.reason).slice(0, 200) }));
+
 function applyTheme() {
   let t = st.theme;
   if (t === 'telegram') t = tg?.colorScheme ? (tg.colorScheme === 'light' ? 'light' : 'dark') : (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
@@ -379,6 +407,7 @@ try { tg?.onEvent?.('themeChanged', applyTheme); } catch {}
 
 function go(view) {
   st.view = view; st.sub = null;
+  track('screen', { v: view });
   for (const v of ['now', 'schedule', 'services', 'settings']) { const el = $('v-' + v); el.hidden = v !== view; if (v === view) { el.classList.remove('fade'); void el.offsetWidth; el.classList.add('fade'); } }
   document.querySelectorAll('nav.tabs button').forEach(b => b.classList.toggle('sel', b.dataset.go === view));
   render();
@@ -461,13 +490,13 @@ function renderSchedule() {
   $('sch-list').innerHTML = day.lessons.length ? day.lessons.map(l => lessonCard(l, sel === todayIso ? minutes : null)).join('')
     : `<div class="empty"><b>Занятий нет</b>Можно выдохнуть</div>`;
 }
-$('sch-days').addEventListener('click', e => { const b = e.target.closest('[data-d]'); if (b) { st.selDate = b.dataset.d; haptic('sel'); renderSchedule(); } });
-$('sch-prev').onclick = () => { st.selDate = addDays(mondayOf(st.selDate || moscowNow().iso), -7); renderSchedule(); };
-$('sch-next').onclick = () => { st.selDate = addDays(mondayOf(st.selDate || moscowNow().iso), 7); renderSchedule(); };
-$('sch-today').onclick = () => { st.selDate = null; renderSchedule(); };
+$('sch-days').addEventListener('click', e => { const b = e.target.closest('[data-d]'); if (b) { st.selDate = b.dataset.d; haptic('sel'); track('day_select'); renderSchedule(); } });
+$('sch-prev').onclick = () => { track('week_nav', { dir: -1 }); st.selDate = addDays(mondayOf(st.selDate || moscowNow().iso), -7); renderSchedule(); };
+$('sch-next').onclick = () => { track('week_nav', { dir: 1 }); st.selDate = addDays(mondayOf(st.selDate || moscowNow().iso), 7); renderSchedule(); };
+$('sch-today').onclick = () => { track('today_btn'); st.selDate = null; renderSchedule(); };
 let tx = null;
 $('sch-list').addEventListener('touchstart', e => { tx = e.touches[0].clientX; }, { passive: true });
-$('sch-list').addEventListener('touchend', e => { if (tx == null) return; const dx = e.changedTouches[0].clientX - tx; tx = null; if (Math.abs(dx) > 60) { st.selDate = addDays(st.selDate || moscowNow().iso, dx < 0 ? 1 : -1); renderSchedule(); } });
+$('sch-list').addEventListener('touchend', e => { if (tx == null) return; const dx = e.changedTouches[0].clientX - tx; tx = null; if (Math.abs(dx) > 60) { track('swipe', { dir: dx < 0 ? 1 : -1 }); st.selDate = addDays(st.selDate || moscowNow().iso, dx < 0 ? 1 : -1); renderSchedule(); } });
 
 // ---------- сервисы: ресурсы (каналы с лекциями и материалами) — список в resources.json
 const TG_ICON = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M21 4 3 11l6 2 2 6 3-4 5 4z"/><path d="m9 13 8-6"/></svg>';
@@ -538,6 +567,7 @@ function renderStats() {
 
 function openSub(name) {  // подстраница «Сервисов»; null — назад к списку
   st.sub = name;
+  if (name) track('sub', { v: name });
   $('svc-home').hidden = !!name;
   for (const el of document.querySelectorAll('[id^="svc-sub-"]')) el.hidden = el.id !== 'svc-sub-' + name;
   window.scrollTo(0, 0);
@@ -567,6 +597,7 @@ async function renderServices() {
 $('svc-res').onclick = e => {
   const b = e.target.closest('[data-url]'); if (!b) return;
   const url = b.dataset.url; haptic('sel');
+  track('resource', { title: b.querySelector('b')?.textContent || url });
   if (/^https:\/\/t\.me\//.test(url) && tg?.openTelegramLink) tg.openTelegramLink(url);
   else if (tg?.openLink) tg.openLink(url); else window.open(url, '_blank');
 };
@@ -584,8 +615,8 @@ function renderSettings() {
     + (st.favs.length < MAX_FAVS ? `<button class="fav add" data-addfav>+ Добавить</button>` : '');
   $('set-version').textContent = S.index.semester.title;
 }
-$('set-theme').onclick = e => { const b = e.target.closest('[data-v]'); if (!b) return; st.theme = b.dataset.v; prefs.set('theme', st.theme); applyTheme(); haptic('sel'); renderSettings(); };
-$('set-accent').onclick = e => { const b = e.target.closest('[data-v]'); if (!b) return; st.accent = b.dataset.v; prefs.set('accent', st.accent); applyTheme(); haptic('sel'); renderSettings(); };
+$('set-theme').onclick = e => { const b = e.target.closest('[data-v]'); if (!b) return; st.theme = b.dataset.v; track('theme', { v: st.theme }); prefs.set('theme', st.theme); applyTheme(); haptic('sel'); renderSettings(); };
+$('set-accent').onclick = e => { const b = e.target.closest('[data-v]'); if (!b) return; st.accent = b.dataset.v; track('accent', { v: st.accent }); prefs.set('accent', st.accent); applyTheme(); haptic('sel'); renderSettings(); };
 
 // ---------- выбор группы (нижняя панель)
 const sh = { fac: null, course: null, mode: 'pick' };  // mode: pick — выбрать свою группу, fav — добавить в избранное
@@ -636,8 +667,8 @@ $('scrim').onclick = () => fbOpen ? closeFb() : closeSheet();
 document.addEventListener('keydown', e => { if (e.key !== 'Escape') return; if (fbOpen) closeFb(); else if (sheetOpen) closeSheet(); });
 async function pickGroup(e) {
   const b = e.target.closest('[data-g]'); if (!b) return;
-  if (sh.mode === 'fav') { addFav(b.dataset.g); haptic('success'); closeSheet(); return; }
-  await selectGroup(b.dataset.g); prefs.set('group', st.group); haptic('success'); closeSheet(); render();
+  if (sh.mode === 'fav') { addFav(b.dataset.g); track('fav_add', { fav: b.dataset.g }); haptic('success'); closeSheet(); return; }
+  await selectGroup(b.dataset.g); prefs.set('group', st.group); track('group_select', { via: b.closest('#sheet-favs') ? 'fav_chip' : $('sheet-q').value ? 'search' : 'list' }); haptic('success'); closeSheet(); render();
 }
 $('sheet-list').onclick = pickGroup;
 $('sheet-favs').onclick = pickGroup;
@@ -648,16 +679,17 @@ function saveFavs() { prefs.set('favs', JSON.stringify(st.favs)); renderSettings
 function addFav(id) { if (!st.favs.includes(id) && st.favs.length < MAX_FAVS) { st.favs.push(id); saveFavs(); } }
 $('set-favs').onclick = async e => {
   const un = e.target.closest('[data-unfav]');
-  if (un) { st.favs = st.favs.filter(x => x !== un.dataset.unfav); haptic('sel'); saveFavs(); return; }
+  if (un) { st.favs = st.favs.filter(x => x !== un.dataset.unfav); track('fav_remove'); haptic('sel'); saveFavs(); return; }
   if (e.target.closest('[data-addfav]')) { openSheet('fav'); return; }
   const f = e.target.closest('[data-fav]');
-  if (f && f.dataset.fav !== st.group) { await selectGroup(f.dataset.fav); prefs.set('group', st.group); haptic('success'); render(); }
+  if (f && f.dataset.fav !== st.group) { await selectGroup(f.dataset.fav); prefs.set('group', st.group); track('fav_switch'); track('group_select', { via: 'fav' }); haptic('success'); render(); }
 };
 
 // ---------- поделиться: ссылка открывает Mini App сразу на этой группе
 $('set-share').onclick = () => {
   const g = groupInfo(st.group); if (!g) return;
   const url = `https://t.me/${BOT}/app?startapp=${g.slug}&mode=fullscreen`;
+  track('share');
   const share = `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(`Расписание группы ${g.id}`)}`;
   haptic('sel');
   if (tg?.openTelegramLink) tg.openTelegramLink(share); else window.open(share, '_blank');
@@ -699,7 +731,7 @@ function openBotFallback(kind) {  // временно, пока у бота не
 }
 document.addEventListener('click', e => {
   const b = e.target.closest('[data-fb]'); if (!b) return;
-  haptic('sel'); FEEDBACK_API ? openFb(b.dataset.fb) : openBotFallback(b.dataset.fb);
+  haptic('sel'); track('feedback', { kind: b.dataset.fb }); FEEDBACK_API ? openFb(b.dataset.fb) : openBotFallback(b.dataset.fb);
 });
 $('fb-close').onclick = closeFb;
 $('fb-send').onclick = async () => {
@@ -731,6 +763,9 @@ async function selectGroup(id) { st.data = await S.loadGroup(id); st.group = st.
     const start = tg?.initDataUnsafe?.start_param || new URLSearchParams(location.search).get('group');
     let pick = (start && S.findGroup(start)?.id) || (g && groupInfo(g) ? g : null);
     await selectGroup(pick || S.listGroups()[0].id);
+    track('app_open', { start: tg?.initDataUnsafe?.start_param || null, platform: tg?.platform || 'web', theme: st.theme,
+                        accent: st.accent, fs: !!tg?.isFullscreen, favs: st.favs.length, first: !g });
+    if (start && pick && pick !== g) track('group_select', { via: 'link' });
     $('boot').hidden = true;
     go('now');
     if (!pick) openSheet();
