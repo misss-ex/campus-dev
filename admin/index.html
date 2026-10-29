@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Админка</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  /* Админка «СтГМУ Помощника»: те же токены, что в приложении. Данные отдаёт бот только владельцу (OWNER_ID). */
+  :root {
+    color-scheme: dark;
+    --bg: #0a1310; --card: #12211c; --card-2: #172a24; --line: rgba(160, 220, 195, .09); --line-2: rgba(160, 220, 195, .18);
+    --text: #e9f3ee; --muted: #8fa89d; --faint: #5d7569;
+    --accent: #7fe0b5; --accent-ink: #062418; --accent-soft: rgba(127, 224, 181, .13);
+    --warn: #f3c278; --bad: #f39c9c; --r: 16px;
+    --font: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  :root[data-mode="light"] {
+    color-scheme: light;
+    --bg: #f2f6f4; --card: #ffffff; --card-2: #f4faf7; --line: rgba(20, 60, 45, .08); --line-2: rgba(20, 60, 45, .16);
+    --text: #10211b; --muted: #5e736a; --faint: #93a59d; --accent: #1fa673; --accent-ink: #ffffff; --accent-soft: rgba(31, 166, 115, .1);
+    --warn: #b9770f; --bad: #c0392b;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.45 var(--font); }
+  html { touch-action: pan-x pan-y; }
+  button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+  .wrap { max-width: 560px; margin: 0 auto; padding: calc(14px + var(--tg-safe-area-inset-top, 0px) + var(--tg-content-safe-area-inset-top, 0px)) 16px 40px; }
+  .num { font-variant-numeric: tabular-nums; }
+  header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+  .eyebrow { font-size: 12px; font-weight: 600; color: var(--muted); }
+  h1 { margin: 2px 0 0; font-size: 26px; font-weight: 800; letter-spacing: -.02em; }
+  .pill { font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 999px; background: var(--line); color: var(--muted); }
+  .pill.ok { background: var(--accent-soft); color: var(--accent); }
+  .pill.demo { background: rgba(243, 194, 120, .15); color: var(--warn); }
+  .seg { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 4px; padding: 4px; border-radius: 14px; background: var(--card); border: 1px solid var(--line); margin-bottom: 12px; }
+  .seg button { height: 34px; border-radius: 10px; font-size: 13px; font-weight: 700; color: var(--muted); }
+  .seg button.sel { background: var(--card-2); color: var(--text); box-shadow: 0 1px 0 var(--line-2) inset; }
+  .seg.small button { height: 30px; font-size: 12px; }
+  .card { padding: 14px; border-radius: var(--r); background: var(--card); border: 1px solid var(--line); margin-bottom: 10px; }
+  .card h3 { margin: 0 0 10px; font-size: 14px; font-weight: 800; display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+  .card h3 span { font-size: 12px; font-weight: 600; color: var(--muted); }
+  .kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 10px; }
+  .kpi { padding: 12px; border-radius: var(--r); background: var(--card); border: 1px solid var(--line); min-width: 0; }
+  .kpi b { display: block; font-size: 22px; font-weight: 800; letter-spacing: -.02em; }
+  .kpi span { display: block; font-size: 11px; color: var(--muted); line-height: 1.25; margin-top: 2px; }
+  .kpi em { font-style: normal; color: var(--accent); font-weight: 700; }
+  /* вертикальные столбики: одна серия — один цвет, подпись по нажатию */
+  .vb { position: relative; }
+  .vb svg { display: block; width: 100%; height: 120px; overflow: visible; }
+  .vb .bar { fill: var(--accent); }
+  .vb .hit { fill: transparent; cursor: pointer; }
+  .vb .hit:hover + .bar, .vb .bar.on { fill: var(--text); }
+  .vb .base { stroke: var(--line-2); stroke-width: 1; }
+  .vb .max { font-size: 10px; fill: var(--faint); }
+  .vb .lbl { display: flex; justify-content: space-between; font-size: 10px; color: var(--faint); margin-top: 4px; }
+  .tip { position: absolute; top: -6px; transform: translate(-50%, -100%); pointer-events: none; white-space: nowrap; padding: 4px 8px; border-radius: 8px; background: var(--text); color: var(--bg); font-size: 12px; font-weight: 700; }
+  /* горизонтальные полоски для рейтингов */
+  .hb { display: grid; grid-template-columns: minmax(0, 1fr); gap: 9px; }
+  .hb .row .t { display: flex; justify-content: space-between; gap: 10px; font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+  .hb .row .t span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .hb .row .t b { flex: none; font-weight: 800; }
+  .hb .row .t small { color: var(--muted); font-weight: 600; margin-left: 4px; }
+  .hb .tr { height: 6px; border-radius: 6px; background: var(--line); overflow: hidden; }
+  .hb .tr i { display: block; height: 100%; border-radius: 6px; background: var(--accent); }
+  .empty { color: var(--muted); font-size: 13px; text-align: center; padding: 18px 8px; }
+  .item { padding: 14px; border-radius: var(--r); background: var(--card); border: 1px solid var(--line); margin-bottom: 8px; }
+  .item .h { display: flex; justify-content: space-between; gap: 8px; font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+  .item .h b { color: var(--text); }
+  .item .txt { white-space: pre-wrap; word-break: break-word; font-size: 14px; }
+  .item .acts { display: flex; gap: 8px; margin-top: 12px; }
+  .item .acts button { flex: 1; height: 38px; border-radius: 12px; font-weight: 700; font-size: 13px; background: var(--card-2); border: 1px solid var(--line-2); }
+  .item .acts button.pri { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .tag { display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 999px; background: var(--line); color: var(--muted); }
+  .tag.open { background: rgba(243, 194, 120, .15); color: var(--warn); }
+  .tag.done { background: var(--accent-soft); color: var(--accent); }
+  .tag.rejected { background: var(--line); color: var(--muted); }
+  .user { display: grid; grid-template-columns: 36px 1fr auto; gap: 10px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--line); }
+  .user:last-child { border-bottom: 0; }
+  .av { width: 36px; height: 36px; border-radius: 12px; display: grid; place-items: center; background: var(--accent-soft); color: var(--accent); font-weight: 800; font-size: 13px; }
+  .user b { display: block; font-size: 14px; }
+  .user span { font-size: 12px; color: var(--muted); }
+  .user .r { text-align: right; font-size: 11px; color: var(--faint); }
+  .banner { padding: 16px; border-radius: var(--r); border: 1px dashed var(--line-2); color: var(--muted); font-size: 13px; margin-bottom: 12px; }
+  .banner b { display: block; color: var(--text); font-size: 15px; margin-bottom: 4px; }
+  .btn { display: block; width: 100%; height: 44px; margin-top: 12px; border-radius: 12px; background: var(--accent); color: var(--accent-ink); font-weight: 800; }
+  .foot { text-align: center; font-size: 11px; color: var(--faint); margin-top: 6px; }
+  .toast { position: fixed; left: 16px; right: 16px; bottom: 24px; max-width: 420px; margin: 0 auto; padding: 12px 16px; border-radius: 14px; background: var(--text); color: var(--bg); font-weight: 700; text-align: center; }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header><div><div class="eyebrow">СтГМУ Помощник</div><h1>Админка</h1></div><span class="pill" id="mode">…</span></header>
+  <div class="banner" id="banner" hidden></div>
+  <div class="seg" id="tabs">
+    <button data-t="stats" class="sel">Аналитика</button><button data-t="reports">Заявки</button><button data-t="ideas">Идеи</button><button data-t="users">Люди</button>
+  </div>
+  <section id="t-stats">
+    <div class="seg small" id="period"><button data-d="1">Сегодня</button><button data-d="7" class="sel">7 дней</button><button data-d="30">30 дней</button><button data-d="90">90 дней</button></div>
+    <div id="stats"></div>
+  </section>
+  <section id="t-reports" hidden>
+    <div class="seg small" id="rep-filter"><button data-o="1" class="sel">Открытые</button><button data-o="0">Все</button></div>
+    <div id="reports"></div>
+  </section>
+  <section id="t-ideas" hidden><div id="ideas"></div></section>
+  <section id="t-users" hidden><div class="card" id="users"></div></section>
+</div>
+
+<script>
+// Адрес бота — тот же сервер, что у формы ошибок (FEEDBACK_API в index.html, без /api/feedback).
+// Пока VPS нет — пусто, и админка показывает демо-данные из demo.json.
+const API_BASE = '';
+const tg = window.Telegram?.WebApp;
+try { tg?.ready(); tg?.expand(); } catch {}
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const plural = (n, a, b, c) => { const m = n % 10, h = n % 100; return m === 1 && h !== 11 ? a : m >= 2 && m <= 4 && (h < 12 || h > 14) ? b : c; };
+const pct = (a, b) => b ? Math.round(a / b * 100) + '%' : '—';
+const gid = slug => { const [p, n] = String(slug).split('-'); return `${{ kp: 'КП', s: 'С', l: 'Л', p: 'П' }[p] || p.toUpperCase()}-${n}`; };
+const ddmm = iso => `${iso.slice(8, 10)}.${iso.slice(5, 7)}`;
+const when = iso => iso ? `${ddmm(iso)} ${iso.slice(11, 16)}` : '';
+const haptic = () => { try { tg?.HapticFeedback?.selectionChanged(); } catch {} };
+document.documentElement.dataset.mode = tg?.colorScheme === 'light' ? 'light' : 'dark';
+try { tg?.setHeaderColor(getComputedStyle(document.documentElement).getPropertyValue('--bg').trim()); } catch {}
+
+const st = { tab: 'stats', days: 7, openOnly: true, demo: false, demoData: null };
+
+async function api(action, body = {}) {
+  if (st.demo) {
+    st.demoData ||= await (await fetch('./demo.json', { cache: 'no-cache' })).json();
+    if (action === 'close') return { closed: true };
+    if (action === 'stats') return st.demoData.stats[body.days];
+    return action === 'reports' ? st.demoData[body.kind === 'idea' ? 'ideas' : 'reports'].filter(r => body.kind === 'idea' || !body.open || r.status === 'open')
+         : st.demoData[action];
+  }
+  const r = await fetch(`${API_BASE}/api/admin/${action}`, { method: 'POST', headers: { 'Content-Type': 'text/plain' },
+    body: JSON.stringify({ initData: tg?.initData || '', ...body }) });
+  if (r.status === 403) throw new Error('Нет доступа: админка открывается только владельцу из бота (/admin)');
+  const j = await r.json();
+  if (!j.ok) throw new Error(j.error || 'ошибка сервера');
+  return j.data;
+}
+
+// ---------- графики
+function vbars(values, labels, every = 1) {
+  const W = 320, H = 110, n = values.length, gap = 2, bw = (W - gap * (n - 1)) / n, max = Math.max(...values, 1);
+  const bars = values.map((v, i) => {
+    const h = v ? Math.max(3, v / max * (H - 14)) : 0, x = i * (bw + gap), y = H - h;
+    const d = h ? `M${x},${H}V${y + 3}q0,-3 3,-3h${bw - 6}q3,0 3,3V${H}z` : '';  // скруглённый верх, ровное основание
+    return `<rect class="hit" x="${x}" y="0" width="${bw + gap}" height="${H}" data-i="${i}"/><path class="bar" d="${d}"/>`;
+  }).join('');
+  const lbl = labels.map((l, i) => i % every === 0 || i === n - 1 ? `<span>${esc(l)}</span>` : '').filter(Boolean).join('');
+  return `<div class="vb" data-v='${JSON.stringify(values)}' data-l='${esc(JSON.stringify(labels))}'>
+    <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">${bars}<line class="base" x1="0" x2="${W}" y1="${H}" y2="${H}"/><text class="max" x="0" y="8">${max}</text></svg>
+    <div class="lbl">${lbl}</div></div>`;
+}
+document.addEventListener('pointerover', showTip);
+document.addEventListener('pointerdown', showTip);
+function showTip(e) {
+  const hit = e.target.closest?.('.vb .hit');
+  document.querySelectorAll('.tip').forEach(t => t.remove());
+  document.querySelectorAll('.vb .bar.on').forEach(b => b.classList.remove('on'));
+  if (!hit) return;
+  const vb = hit.closest('.vb'), i = +hit.dataset.i, v = JSON.parse(vb.dataset.v)[i], l = JSON.parse(vb.dataset.l)[i];
+  hit.nextElementSibling.classList.add('on');
+  const r = hit.getBoundingClientRect(), base = vb.getBoundingClientRect();
+  vb.insertAdjacentHTML('beforeend', `<div class="tip num" style="left:${r.left - base.left + r.width / 2}px">${esc(l)}: ${v}</div>`);
+}
+function hbars(rows, total) {
+  if (!rows?.length) return '<div class="empty">Пока нет данных</div>';
+  const max = Math.max(...rows.map(r => r[1]), 1);
+  return `<div class="hb">${rows.map(([k, v]) => `<div class="row"><div class="t"><span>${esc(k)}</span><b class="num">${v}${total ? `<small>${pct(v, total)}</small>` : ''}</b></div>
+    <div class="tr"><i style="width:${(v / max * 100).toFixed(1)}%"></i></div></div>`).join('')}</div>`;
+}
+const card = (title, body, note = '') => `<div class="card"><h3>${esc(title)}<span>${esc(note)}</span></h3>${body}</div>`;
+
+// ---------- вкладки
+async function renderStats() {
+  $('stats').innerHTML = '<div class="empty">Загрузка…</div>';
+  const m = await api('stats', { days: st.days });
+  const [r1, b1] = m.retention1, [r7, b7] = m.retention7, [fNew, fApp, fGrp] = m.funnel;
+  const days = m.day_list.map(ddmm), wd = ['пн', 'вт', 'ср', 'чт', 'пт', 'сб', 'вс'];
+  $('stats').innerHTML = `
+    <div class="kpis num">
+      <div class="kpi"><b>${m.total_users}</b><span>всего · <em>+${m.new}</em> за период</span></div>
+      <div class="kpi"><b>${m.dau}</b><span>активны сегодня</span></div>
+      <div class="kpi"><b>${m.wau}</b><span>активны за 7 дней</span></div>
+      <div class="kpi"><b>${m.mau}</b><span>активны за 30 дней</span></div>
+      <div class="kpi"><b>${pct(r1, b1)}</b><span>вернулись на 2-й день</span></div>
+      <div class="kpi"><b>${pct(r7, b7)}</b><span>вернулись через неделю</span></div>
+    </div>
+    ${m.days > 1 ? card('Активные по дням', vbars(m.daily_active, days, Math.ceil(days.length / 7)), 'уникальные') : ''}
+    ${m.days > 1 ? card('Новые по дням', vbars(m.daily_new, days, Math.ceil(days.length / 7))) : ''}
+    ${card('Воронка новых', hbars([['Пришли', fNew], ['Открыли приложение', fApp], ['Выбрали группу', fGrp]], fNew))}
+    ${card('Откуда пришли', hbars(m.sources), 'новые')}
+    ${card('Mini App', `<div class="kpis num" style="margin:0;grid-template-columns:1fr 1fr">
+        <div class="kpi"><b>${m.app_users}</b><span>пользователей</span></div>
+        <div class="kpi"><b>${m.app_opens}</b><span>открытий</span></div>
+        <div class="kpi"><b>${(m.session_median / 60).toFixed(1).replace('.', ',')} мин</b><span>обычная сессия · в среднем ${(m.session_avg / 60).toFixed(1).replace('.', ',')}</span></div>
+        <div class="kpi"><b>${pct(m.fullscreen, m.opens_n)}</b><span>открытий на весь экран</span></div></div>`)}
+    ${card('Экраны', hbars(m.screens))}
+    ${m.subs.length ? card('Разделы сервисов', hbars(m.subs)) : ''}
+    ${card('Функции', hbars(m.features))}
+    ${m.resources.length ? card('Ресурсы', hbars(m.resources.slice(0, 8)), 'переходы') : ''}
+    ${card('Группы', hbars(m.groups.slice(0, 10)), 'уникальные люди')}
+    ${card('Факультеты и курсы', hbars(m.faculties))}
+    ${card('Как выбирают группу', hbars(m.group_via))}
+    ${card('Платформы', hbars(m.platforms, m.opens_n), 'открытия')}
+    ${card('Тема', hbars(m.themes, m.opens_n))}
+    ${card('По часам', vbars(m.hours, m.hours.map((_, h) => String(h).padStart(2, '0') + ':00'), 3), 'открытия, по Москве')}
+    ${card('По дням недели', vbars(m.wdays, wd))}
+    ${m.errors.length ? card('⚠️ Ошибки в приложении', hbars(m.errors)) : ''}
+    ${card('Бот', hbars([['/start', m.bot_starts], ['Заявки', m.reports], ['Идеи', m.ideas]]))}
+    <div class="foot num">Событий за период: ${m.events} · без твоих действий</div>`;
+}
+function reportItem(r, idea) {
+  const status = idea ? '' : `<span class="tag ${r.status}">${{ open: 'открыта', done: 'исправлено', rejected: 'не ошибка' }[r.status]}</span>`;
+  return `<div class="item" data-id="${r.id}"><div class="h"><span><b>№${r.id}</b>${r.grp ? ' · ' + esc(gid(r.grp)) : ''} · ${esc(r.user_name)}</span><span>${when(r.created_at)}</span></div>
+    <div class="txt">${esc(r.text)}</div>${r.photo ? '<div class="h" style="margin:8px 0 0">📎 скриншот — в группе модерации</div>' : ''}
+    ${r.resolution ? `<div class="h" style="margin:8px 0 0">Ответ: ${esc(r.resolution)}</div>` : ''}
+    ${idea ? '' : r.status === 'open' ? `<div class="acts"><button class="pri" data-close="done">✅ Исправлено</button><button data-close="rejected">Не ошибка</button></div>` : `<div style="margin-top:8px">${status}</div>`}</div>`;
+}
+async function renderReports() {
+  const rows = await api('reports', { kind: 'report', open: st.openOnly });
+  $('reports').innerHTML = rows.length ? rows.map(r => reportItem(r)).join('') : `<div class="empty">${st.openOnly ? 'Открытых заявок нет 🎉' : 'Заявок пока нет'}</div>`;
+}
+async function renderIdeas() {
+  const rows = await api('reports', { kind: 'idea' });
+  $('ideas').innerHTML = rows.length ? rows.map(r => reportItem(r, true)).join('') : '<div class="empty">Идей пока нет</div>';
+}
+async function renderUsers() {
+  const rows = await api('users');
+  $('users').innerHTML = rows.length ? `<h3 style="margin:0 0 4px;font-size:14px">Последние ${rows.length}</h3>` + rows.map(u => `<div class="user">
+    <span class="av">${esc((u.name || '?')[0])}</span>
+    <div style="min-width:0"><b>${esc(u.name || 'Без имени')}${u.username ? ` <span>@${esc(u.username)}</span>` : ''}</b>
+      <span>${esc(u.group || 'группа не выбрана')} · ${esc(u.platform || '—')} · ${esc(u.source)}</span></div>
+    <div class="r num">${when(u.last_seen)}<br>с ${ddmm(u.first_seen)}</div></div>`).join('') : '<div class="empty">Пользователей пока нет</div>';
+}
+const RENDER = { stats: renderStats, reports: renderReports, ideas: renderIdeas, users: renderUsers };
+async function render() {
+  try { await RENDER[st.tab](); }
+  catch (e) { $(st.tab === 'stats' ? 'stats' : st.tab).innerHTML = `<div class="empty">${esc(e.message)}</div>`; }
+}
+function toast(t) { const d = document.createElement('div'); d.className = 'toast'; d.textContent = t; document.body.append(d); setTimeout(() => d.remove(), 2500); }
+
+$('tabs').onclick = e => { const b = e.target.closest('[data-t]'); if (!b) return; haptic(); st.tab = b.dataset.t;
+  document.querySelectorAll('#tabs button').forEach(x => x.classList.toggle('sel', x === b));
+  for (const t of Object.keys(RENDER)) $('t-' + t).hidden = t !== st.tab; render(); };
+$('period').onclick = e => { const b = e.target.closest('[data-d]'); if (!b) return; haptic(); st.days = +b.dataset.d;
+  document.querySelectorAll('#period button').forEach(x => x.classList.toggle('sel', x === b)); render(); };
+$('rep-filter').onclick = e => { const b = e.target.closest('[data-o]'); if (!b) return; haptic(); st.openOnly = b.dataset.o === '1';
+  document.querySelectorAll('#rep-filter button').forEach(x => x.classList.toggle('sel', x === b)); render(); };
+$('reports').onclick = async e => {
+  const b = e.target.closest('[data-close]'); if (!b) return;
+  const item = b.closest('[data-id]'); haptic();
+  try {
+    const r = await api('close', { id: +item.dataset.id, status: b.dataset.close });
+    if (st.demo) { const x = st.demoData.reports.find(x => x.id === +item.dataset.id); if (x) x.status = b.dataset.close; }
+    toast(r.closed ? (b.dataset.close === 'done' ? 'Отмечено: исправлено' : 'Отмечено: не ошибка') : 'Уже закрыта');
+    render();
+  } catch (err) { toast(err.message); }
+};
+
+function setMode() {
+  $('mode').className = 'pill ' + (st.demo ? 'demo' : 'ok');
+  $('mode').textContent = st.demo ? 'демо-данные' : 'сервер';
+  $('banner').hidden = !st.demo;
+  $('banner').innerHTML = API_BASE ? '' : '<b>Сервер ещё не подключён</b>Настоящие цифры появятся вместе с VPS. Сейчас показаны выдуманные данные — чтобы посмотреть, как всё выглядит.';
+}
+st.demo = !API_BASE;
+setMode();
+render();
+</script>
+</body>
+</html>
