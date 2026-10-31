@@ -266,12 +266,12 @@
     <div id="svc-home">
     <header class="top"><div><div class="eyebrow">СтГМУ</div><h1>Сервисы</h1></div></header>
     <div class="cards">
-      <button class="group-card" data-sub="market"><span class="avatar"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14l-1 12H6z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg></span>
-        <span class="gt"><b>Маркет</b><span>Купить, продать или отдать вещи для учёбы</span></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></button>
       <button class="group-card" data-sub="res"><span class="avatar"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 19V5M8 7h7"/></svg></span>
         <span class="gt"><b>Ресурсы для учёбы</b><span id="svc-res-count">Каналы с лекциями и материалами</span></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></button>
       <button class="group-card" data-sub="stats"><span class="avatar"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></span>
         <span class="gt"><b>Семестр в цифрах</b><span id="svc-stats-sub">Сколько позади и сколько осталось</span></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></button>
+      <button class="group-card" data-sub="market"><span class="avatar"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14l-1 12H6z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg></span>
+        <span class="gt"><b>Маркет</b><span>Купить, продать или отдать вещи для учёбы</span></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></button>
     </div>
     <div class="label">Скоро</div>
     <div class="cards">
@@ -289,6 +289,7 @@
     </div>
     <div id="svc-sub-market" hidden>
       <header class="top"><div><button class="eyebrow back" data-sub-close>‹ Сервисы</button><h1>Маркет</h1></div><button class="chip-btn" id="mk-new">+ Объявление</button></header>
+      <label class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input id="mk-q" type="search" placeholder="Поиск по названию" autocomplete="off" enterkeyhint="search"></label>
       <div class="tabs-row" id="mk-kinds"></div>
       <div class="tabs-row" id="mk-cats"></div>
       <div id="mk-list" class="mk-grid"></div>
@@ -839,8 +840,8 @@ const MK_CATS = { form: 'Халаты и форма', books: 'Книги и ат
 const MK_STATUS = { sold: 'продано', removed: 'снято модератором', hidden: 'скрыто по жалобам' };
 const MK_ERR = {
   'no username': 'Чтобы покупатели могли вам написать, задайте имя пользователя: Telegram → Настройки → Имя пользователя.',
-  'too many active': 'Не больше 10 активных объявлений. Отметьте проданное или удалите старое.',
-  'too many': 'Не больше 5 новых объявлений в сутки. Попробуйте завтра.',
+  'too many active': 'Сначала отметьте проданным или удалите одно из своих объявлений.',
+  'too many': 'Слишком много объявлений за сутки. Попробуйте завтра.',
   'short title': 'Название — хотя бы 3 символа.', 'no price': 'Укажите цену.', 'bad price': 'Цена — число в рублях.',
   'bad photos': 'Не получилось обработать фото. Попробуйте другое.',
 };
@@ -850,7 +851,7 @@ const MK_DEMO = [
   { id: -3, kind: 'free', cat: 'notes', title: 'Конспекты по гистологии, 1 курс', price: null, descr: 'Заберите у главного корпуса.', user_name: 'Пример', username: 'stgmu_helpbot', created_at: '2026-10-28T09:30:00', photos: [] },
   { id: -4, kind: 'buy', cat: 'tools', title: 'Набор для препарирования', price: 1500, descr: '', user_name: 'Пример', username: 'stgmu_helpbot', created_at: '2026-10-27T20:15:00', photos: [] },
 ];
-const mk = { items: null, mine: [], kind: 'all', cat: 'all', open: false, draft: null, error: '' };
+const mk = { items: null, mine: [], kind: 'all', cat: 'all', q: '', open: false, draft: null, error: '' };
 const mkApi = () => FEEDBACK_API ? FEEDBACK_API.replace(/\/feedback$/, '/market') : '';
 const mkPhoto = name => `${mkApi()}/photo/${encodeURIComponent(name)}`;
 async function mkCall(action, body = {}) {
@@ -882,11 +883,14 @@ function renderMarket() {
   $('mk-cats').hidden = mk.kind === 'mine';
   $('mk-cats').innerHTML = [['all', 'Все вещи'], ...Object.entries(MK_CATS)].map(([k, t]) => `<button class="pill${mk.cat === k ? ' sel' : ''}" data-mk-cat="${k}">${t}</button>`).join('');
   if (!mk.items) { $('mk-list').innerHTML = '<div class="empty"><b>Загружаем…</b></div>'; return; }
-  const list = mk.kind === 'mine' ? mk.mine
-    : mk.items.filter(it => (mk.kind === 'all' || it.kind === mk.kind) && (mk.cat === 'all' || it.cat === mk.cat));
+  const words = mk.q.toLowerCase().replace(/ё/g, 'е').split(/\s+/).filter(Boolean);
+  const found = it => { const t = it.title.toLowerCase().replace(/ё/g, 'е'); return words.every(w => t.includes(w)); };
+  const list = (mk.kind === 'mine' ? mk.mine
+    : mk.items.filter(it => (mk.kind === 'all' || it.kind === mk.kind) && (mk.cat === 'all' || it.cat === mk.cat))).filter(found);
   const demo = !mkApi() ? '<div class="fb-hint" style="grid-column:1/-1">Это примеры: маркет заработает, когда подключим сервер.</div>' : '';
   const err = mk.error ? `<div class="fb-err" style="grid-column:1/-1">${esc(mk.error)}</div>` : '';
-  const empty = mk.kind === 'mine' ? '<div class="empty"><b>Объявлений пока нет</b>Нажмите «+ Объявление», чтобы продать или отдать вещь</div>'
+  const empty = words.length ? '<div class="empty"><b>Ничего не нашлось</b>Попробуйте другое слово или уберите фильтры</div>'
+    : mk.kind === 'mine' ? '<div class="empty"><b>Объявлений пока нет</b>Нажмите «+ Объявление», чтобы продать или отдать вещь</div>'
     : '<div class="empty"><b>Здесь пока пусто</b>Станьте первым — нажмите «+ Объявление»</div>';
   $('mk-list').innerHTML = demo + err + (list.length ? list.map(it => {
     const status = MK_STATUS[it.status] || (it.expired ? 'срок истёк' : '');
@@ -898,6 +902,9 @@ function renderMarket() {
 $('mk-kinds').onclick = e => { const b = e.target.closest('[data-mk-kind]'); if (b) { haptic('sel'); mk.kind = b.dataset.mkKind; track('market_filter', { v: mk.kind }); renderMarket(); } };
 $('mk-cats').onclick = e => { const b = e.target.closest('[data-mk-cat]'); if (b) { haptic('sel'); mk.cat = b.dataset.mkCat; renderMarket(); } };
 $('mk-list').onclick = e => { const b = e.target.closest('[data-mk-item]'); if (b) { haptic('sel'); mkShowItem(+b.dataset.mkItem); } };
+let mkQTimer;
+$('mk-q').oninput = e => { mk.q = e.target.value.trim(); renderMarket(); clearTimeout(mkQTimer); if (mk.q) mkQTimer = setTimeout(() => track('market_search', { q: mk.q.slice(0, 40) }), 1500); };
+$('mk-q').onkeydown = e => { if (e.key === 'Enter') e.target.blur(); };
 $('mk-new').onclick = () => { haptic('sel'); track('market_new'); mkShowForm(); };
 
 function openMk(title) {
