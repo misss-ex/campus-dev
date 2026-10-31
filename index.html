@@ -171,10 +171,10 @@
   .mk-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
   .mk-grid > .empty { grid-column: 1 / -1; }
   .mk-card { display: flex; flex-direction: column; min-width: 0; text-align: left; border-radius: var(--r-md); background: var(--card); border: 1px solid var(--line); overflow: hidden; }
-  .mk-ph { position: relative; aspect-ratio: 1; background: var(--card-2); display: grid; place-items: center; color: var(--faint); }
-  .mk-ph img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .mk-ph { position: relative; aspect-ratio: 1; width: 100%; flex: none; overflow: hidden; background: var(--card-2); display: grid; place-items: center; color: var(--faint); }
+  .mk-ph img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }  /* любое фото — квадрат с обрезкой */
   .mk-ph svg { width: 34px; height: 34px; }
-  .mk-ph .soon { position: absolute; left: 8px; top: 8px; background: var(--bg-2); }
+  .mk-ph .soon { position: absolute; z-index: 1; left: 8px; top: 8px; background: var(--bg-2); }
   .mk-card .ct { padding: 10px 12px 12px; min-width: 0; }
   .mk-card .pr { font-weight: 800; font-size: 16px; }
   .mk-card .tt { font-size: 13px; font-weight: 600; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
@@ -182,7 +182,7 @@
   .mk-card.dim { opacity: .55; }
   .mk-photos { display: flex; gap: 8px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; margin-bottom: 14px; }
   .mk-photos::-webkit-scrollbar { display: none; }
-  .mk-photos img { flex: none; width: 86%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 16px; scroll-snap-align: center; background: var(--card); }
+  .mk-photos img { flex: none; width: 86%; height: auto; aspect-ratio: 4 / 3; min-height: 0; max-height: 60vh; object-fit: cover; border-radius: 16px; scroll-snap-align: center; background: var(--card); }
   .mk-photos img:only-child { width: 100%; }
   .mk-price { font-size: 26px; font-weight: 800; letter-spacing: -.02em; }
   .mk-title { font-size: 17px; font-weight: 700; margin: 2px 0 8px; line-height: 1.3; }
