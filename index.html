@@ -257,8 +257,8 @@
       <div id="svc-stats"></div>
     </div>
     <div id="svc-sub-res" hidden>
-      <header class="top"><div><button class="eyebrow back" data-sub-close>‹ Сервисы</button><h1>Ресурсы</h1></div></header>
-      <p class="svc-sub">Каналы с лекциями и материалами для учёбы.</p>
+      <header class="top"><div><button class="eyebrow back" data-sub-close id="svc-res-back">‹ Сервисы</button><h1 id="svc-res-h">Ресурсы</h1></div></header>
+      <p class="svc-sub" id="svc-res-p">Каналы с лекциями и материалами для учёбы.</p>
       <div id="svc-res"></div>
     </div>
   </section>
@@ -365,7 +365,7 @@ for (const ev of ['gesturestart', 'gesturechange']) document.addEventListener(ev
 const haptic = t => { try { t === 'sel' ? tg?.HapticFeedback?.selectionChanged() : tg?.HapticFeedback?.notificationOccurred(t); } catch {} };
 
 const S = new Schedule({ baseUrl: './data' });
-const st = { view: 'now', group: null, data: null, selDate: null, theme: 'dark', accent: 'mint', favs: [], sub: null };
+const st = { view: 'now', group: null, data: null, selDate: null, theme: 'dark', accent: 'mint', favs: [], sub: null, resDir: null };
 
 // ---------- аналитика: события копим и шлём пачкой на сервер бота (рядом с формой: …/api/event).
 // Подпись initData проверяет сервер, поэтому кто прислал — известно, а подделать нельзя.
@@ -406,7 +406,7 @@ function applyTheme() {
 try { tg?.onEvent?.('themeChanged', applyTheme); } catch {}
 
 function go(view) {
-  st.view = view; st.sub = null;
+  st.view = view; st.sub = null; st.resDir = null;
   track('screen', { v: view });
   for (const v of ['now', 'schedule', 'services', 'settings']) { const el = $('v-' + v); el.hidden = v !== view; if (v === view) { el.classList.remove('fade'); void el.offsetWidth; el.classList.add('fade'); } }
   document.querySelectorAll('nav.tabs button').forEach(b => b.classList.toggle('sel', b.dataset.go === view));
@@ -414,7 +414,7 @@ function go(view) {
   try { view === 'now' ? tg?.BackButton?.hide() : tg?.BackButton?.show(); } catch {}
   window.scrollTo(0, 0);
 }
-try { tg?.BackButton?.onClick(() => fbOpen ? closeFb() : sheetOpen ? closeSheet() : st.sub ? openSub(null) : go('now')); } catch {}
+try { tg?.BackButton?.onClick(() => fbOpen ? closeFb() : sheetOpen ? closeSheet() : st.sub ? subBack() : go('now')); } catch {}
 document.addEventListener('click', e => {
   const b = e.target.closest('[data-go]'); if (b) { haptic('sel'); go(b.dataset.go); }
   if (e.target.closest('[data-open-sheet]')) openSheet();
@@ -499,6 +499,7 @@ $('sch-list').addEventListener('touchstart', e => { tx = e.touches[0].clientX; }
 $('sch-list').addEventListener('touchend', e => { if (tx == null) return; const dx = e.changedTouches[0].clientX - tx; tx = null; if (Math.abs(dx) > 60) { track('swipe', { dir: dx < 0 ? 1 : -1 }); st.selDate = addDays(st.selDate || moscowNow().iso, dx < 0 ? 1 : -1); renderSchedule(); } });
 
 // ---------- сервисы: ресурсы (каналы с лекциями и материалами) — список в resources.json
+const FOLDER_ICON = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>';
 const TG_ICON = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M21 4 3 11l6 2 2 6 3-4 5 4z"/><path d="m9 13 8-6"/></svg>';
 let resources = null;
 // ---------- семестр в цифрах: всё считается из расписания группы, без сервера
@@ -566,16 +567,19 @@ function renderStats() {
 }
 
 function openSub(name) {  // подстраница «Сервисов»; null — назад к списку
-  st.sub = name;
+  st.sub = name; st.resDir = null;
   if (name) track('sub', { v: name });
   $('svc-home').hidden = !!name;
   for (const el of document.querySelectorAll('[id^="svc-sub-"]')) el.hidden = el.id !== 'svc-sub-' + name;
   window.scrollTo(0, 0);
   renderServices();
 }
+function subBack() {  // из папки ресурсов (например «Лекции») — к ресурсам, иначе — к списку сервисов
+  if (st.resDir) { st.resDir = null; window.scrollTo(0, 0); renderServices(); } else openSub(null);
+}
 document.addEventListener('click', e => {
   const b = e.target.closest('[data-sub]'); if (b) { haptic('sel'); openSub(b.dataset.sub); }
-  if (e.target.closest('[data-sub-close]')) { haptic('sel'); openSub(null); }
+  if (e.target.closest('[data-sub-close]')) { haptic('sel'); subBack(); }
 });
 async function renderServices() {
   renderStats();
@@ -585,16 +589,29 @@ async function renderServices() {
     try { resources = await (await fetch('./resources.json', { cache: 'no-cache' })).json(); }
     catch { $('svc-res').innerHTML = '<div class="empty"><b>Не удалось загрузить</b>Проверьте интернет</div>'; return; }
   }
-  const n = resources.sections.reduce((k, sec) => k + sec.items.length, 0);
+  // пункт с url — ссылка, пункт с sections — папка (открывается отдельной страницей, как «Лекции»)
+  const count = secs => secs.reduce((k, sec) => k + sec.items.reduce((m, it) => m + (it.sections ? count(it.sections) : 1), 0), 0);
+  const n = count(resources.sections);
   $('svc-res-count').textContent = `Каналы с лекциями и материалами · ${n} ${plural(n, 'ссылка', 'ссылки', 'ссылок')}`;
+  const dir = st.resDir && resources.sections.flatMap(sec => sec.items).find(it => it.sections && it.title === st.resDir);
+  if (!dir) st.resDir = null;
+  $('svc-res-back').textContent = dir ? '‹ Ресурсы' : '‹ Сервисы';
+  $('svc-res-h').textContent = dir ? dir.title : 'Ресурсы';
+  $('svc-res-p').textContent = dir ? (dir.note ? dir.note[0].toUpperCase() + dir.note.slice(1) + '.' : '') : 'Каналы с лекциями и материалами для учёбы.';
+  $('svc-res-p').hidden = !$('svc-res-p').textContent;
   const handle = url => { const m = url.match(/t\.me\/(\+)?([\w-]+)/); return m ? (m[1] ? 'закрытый канал' : '@' + m[2]) : url.replace(/^https?:\/\//, ''); };
-  $('svc-res').innerHTML = resources.sections.map(sec => `<div class="label">${esc(sec.title)}</div><div class="cards">${
-    sec.items.map(it => `<button class="group-card" data-url="${esc(it.url)}"><span class="avatar">${TG_ICON}</span>
-      <span class="gt"><b>${esc(it.title)}</b><span>${esc(handle(it.url))}${it.note ? ` <span class="sub2">· ${esc(it.note)}</span>` : ''}</span></span>
-      <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></button>`).join('')
-  }</div>`).join('');
+  const chev = '<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg>';
+  const card = it => it.sections
+    ? `<button class="group-card" data-res-dir="${esc(it.title)}"><span class="avatar">${FOLDER_ICON}</span>
+      <span class="gt"><b>${esc(it.title)}</b><span>${count(it.sections)} ${plural(count(it.sections), 'канал', 'канала', 'каналов')}${it.note ? ` <span class="sub2">· ${esc(it.note)}</span>` : ''}</span></span>${chev}</button>`
+    : `<button class="group-card" data-url="${esc(it.url)}"><span class="avatar">${TG_ICON}</span>
+      <span class="gt"><b>${esc(it.title)}</b><span>${esc(handle(it.url))}${it.note ? ` <span class="sub2">· ${esc(it.note)}</span>` : ''}</span></span>${chev}</button>`;
+  $('svc-res').innerHTML = (dir ? dir.sections : resources.sections).map(sec =>
+    `${sec.title ? `<div class="label">${esc(sec.title)}</div>` : ''}<div class="cards">${sec.items.map(card).join('')}</div>`).join('');
 }
 $('svc-res').onclick = e => {
+  const d = e.target.closest('[data-res-dir]');
+  if (d) { haptic('sel'); st.resDir = d.dataset.resDir; track('sub', { v: 'res/' + st.resDir }); window.scrollTo(0, 0); renderServices(); return; }
   const b = e.target.closest('[data-url]'); if (!b) return;
   const url = b.dataset.url; haptic('sel');
   track('resource', { title: b.querySelector('b')?.textContent || url });
