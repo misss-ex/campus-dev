@@ -503,6 +503,7 @@ const FOLDER_ICON = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none"
 const TG_ICON = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M21 4 3 11l6 2 2 6 3-4 5 4z"/><path d="m9 13 8-6"/></svg>';
 let resources = null;
 // ---------- семестр в цифрах: всё считается из расписания группы, без сервера
+const STATS_END = '2026-12-30';  // последний учебный день для «Семестра в цифрах»; пары позже не считаем
 function semesterStats(data, today) {
   const subj = new Map(), days = new Map(), byWd = new Map();
   let total = 0, done = 0, minDone = 0, last = '';
@@ -510,6 +511,7 @@ function semesterStats(data, today) {
     const dur = toMin(ev.end) - toMin(ev.start);
     const sj = subj.get(ev.subject) || { n: 0, left: 0, type: ev.type };
     for (const d of ev.dates) {
+      if (d > STATS_END) continue;
       total++; sj.n++; if (d > last) last = d;
       if (d < today) { done++; minDone += dur; } else sj.left++;
       const day = days.get(d) || { n: 0, first: 1e4, end: 0 };
@@ -522,13 +524,13 @@ function semesterStats(data, today) {
   const busiest = [...byWd].sort((a, b) => b[1].pairs / b[1].dates - a[1].pairs / a[1].dates)[0];
   const longest = [...days].filter(([d]) => d >= today).sort((a, b) => (b[1].end - b[1].first) - (a[1].end - a[1].first))[0];
   const sem = data.semester || S.index.semester;
-  const span = (Date.parse(sem.end) - Date.parse(sem.start)) || 1;
+  const span = (Date.parse(STATS_END) + 864e5 - Date.parse(sem.start)) || 1;
   return {
     total, done, left: total - done, hoursDone: Math.round(minDone / 60), last,
     pct: Math.max(0, Math.min(100, Math.round((Date.parse(today) - Date.parse(sem.start)) / span * 100))),
     studyDays: days.size, daysLeft: [...days.keys()].filter(d => d >= today).length,
     early: [...days].filter(([d, x]) => d >= today && x.first <= 8 * 60).length,
-    subjects: [...subj].map(([name, x]) => ({ name, ...x })).sort((a, b) => b.n - a.n),
+    subjects: [...subj].filter(([, x]) => x.n).map(([name, x]) => ({ name, ...x })).sort((a, b) => b.n - a.n),
     busiest: busiest && { name: WEEKDAYS_FULL[busiest[0] - 1], avg: busiest[1].pairs / busiest[1].dates },
     longest: longest && { date: longest[0], from: longest[1].first, to: longest[1].end, n: longest[1].n },
   };
