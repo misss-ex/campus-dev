@@ -166,6 +166,35 @@
   .fb-err { font-size: 13px; color: var(--warn); margin-top: 8px; }
   .btn { width: 100%; height: 48px; margin-top: 12px; border-radius: 14px; background: var(--accent); color: var(--accent-ink); font-weight: 800; font-size: 15px; }
   .btn:disabled { opacity: .5; }
+  .btn.ghost { background: var(--card); color: var(--text); border: 1px solid var(--line-2); }
+  /* маркет */
+  .mk-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
+  .mk-grid > .empty { grid-column: 1 / -1; }
+  .mk-card { display: flex; flex-direction: column; min-width: 0; text-align: left; border-radius: var(--r-md); background: var(--card); border: 1px solid var(--line); overflow: hidden; }
+  .mk-ph { position: relative; aspect-ratio: 1; background: var(--card-2); display: grid; place-items: center; color: var(--faint); }
+  .mk-ph img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .mk-ph svg { width: 34px; height: 34px; }
+  .mk-ph .soon { position: absolute; left: 8px; top: 8px; background: var(--bg-2); }
+  .mk-card .ct { padding: 10px 12px 12px; min-width: 0; }
+  .mk-card .pr { font-weight: 800; font-size: 16px; }
+  .mk-card .tt { font-size: 13px; font-weight: 600; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .mk-card .mt { font-size: 11px; color: var(--faint); margin-top: 4px; }
+  .mk-card.dim { opacity: .55; }
+  .mk-photos { display: flex; gap: 8px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; margin-bottom: 14px; }
+  .mk-photos::-webkit-scrollbar { display: none; }
+  .mk-photos img { flex: none; width: 86%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 16px; scroll-snap-align: center; background: var(--card); }
+  .mk-photos img:only-child { width: 100%; }
+  .mk-price { font-size: 26px; font-weight: 800; letter-spacing: -.02em; }
+  .mk-title { font-size: 17px; font-weight: 700; margin: 2px 0 8px; line-height: 1.3; }
+  .mk-descr { white-space: pre-wrap; font-size: 15px; margin: 12px 0; }
+  .mk-in { width: 100%; height: 44px; padding: 0 14px; border-radius: 14px; border: 1px solid var(--line-2); background: var(--card); outline: none; }
+  .mk-in:focus { border-color: var(--accent); }
+  .mk-pills { display: flex; flex-wrap: wrap; gap: 6px; }
+  .mk-thumbs { display: flex; gap: 8px; flex-wrap: wrap; }
+  .mk-thumb { position: relative; width: 76px; height: 76px; border-radius: 14px; overflow: hidden; background: var(--card); border: 1px dashed var(--line-2); display: grid; place-items: center; color: var(--muted); font-size: 26px; cursor: pointer; }
+  .mk-thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .mk-thumb .x { position: absolute; top: 3px; right: 3px; width: 22px; height: 22px; border-radius: 50%; background: rgba(0, 0, 0, .6); color: #fff; font-size: 14px; line-height: 22px; text-align: center; }
+  .mk-link { display: block; margin: 14px auto 0; font-size: 13px; color: var(--muted); padding: 6px 10px; }
   .toast { position: fixed; left: 16px; right: 16px; bottom: calc(96px + var(--sb)); z-index: 60; max-width: 420px; margin: 0 auto; padding: 12px 16px; border-radius: 14px; background: var(--text); color: var(--bg); font-weight: 700; font-size: 14px; text-align: center; box-shadow: var(--shadow); animation: fade .2s ease; }
 
   /* sheet */
@@ -237,6 +266,8 @@
     <div id="svc-home">
     <header class="top"><div><div class="eyebrow">СтГМУ</div><h1>Сервисы</h1></div></header>
     <div class="cards">
+      <button class="group-card" data-sub="market"><span class="avatar"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14l-1 12H6z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg></span>
+        <span class="gt"><b>Маркет</b><span>Купить, продать или отдать вещи для учёбы</span></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></button>
       <button class="group-card" data-sub="res"><span class="avatar"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 19V5M8 7h7"/></svg></span>
         <span class="gt"><b>Ресурсы для учёбы</b><span id="svc-res-count">Каналы с лекциями и материалами</span></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></button>
       <button class="group-card" data-sub="stats"><span class="avatar"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></span>
@@ -255,6 +286,12 @@
     <div id="svc-sub-stats" hidden>
       <header class="top"><div><button class="eyebrow back" data-sub-close>‹ Сервисы</button><h1>Семестр в цифрах</h1></div></header>
       <div id="svc-stats"></div>
+    </div>
+    <div id="svc-sub-market" hidden>
+      <header class="top"><div><button class="eyebrow back" data-sub-close>‹ Сервисы</button><h1>Маркет</h1></div><button class="chip-btn" id="mk-new">+ Объявление</button></header>
+      <div class="tabs-row" id="mk-kinds"></div>
+      <div class="tabs-row" id="mk-cats"></div>
+      <div id="mk-list" class="mk-grid"></div>
     </div>
     <div id="svc-sub-res" hidden>
       <header class="top"><div><button class="eyebrow back" data-sub-close id="svc-res-back">‹ Сервисы</button><h1 id="svc-res-h">Ресурсы</h1></div></header>
@@ -328,6 +365,14 @@
     <div class="fb-err" id="fb-err" hidden></div>
     <button class="btn" id="fb-send">Отправить</button>
   </div>
+</div>
+
+<div class="sheet" id="mk" role="dialog" aria-modal="true" aria-labelledby="mk-t" hidden>
+  <div class="sheet-head">
+    <div class="grabber"></div>
+    <div class="sheet-title"><b id="mk-t"></b><button class="icon-btn" id="mk-close" aria-label="Закрыть"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+  </div>
+  <div class="sheet-body" id="mk-body"></div>
 </div>
 
 <nav class="tabs"><div class="in">
@@ -414,7 +459,7 @@ function go(view) {
   try { view === 'now' ? tg?.BackButton?.hide() : tg?.BackButton?.show(); } catch {}
   window.scrollTo(0, 0);
 }
-try { tg?.BackButton?.onClick(() => fbOpen ? closeFb() : sheetOpen ? closeSheet() : st.sub ? subBack() : go('now')); } catch {}
+try { tg?.BackButton?.onClick(() => fbOpen ? closeFb() : mk.open ? closeMk() : sheetOpen ? closeSheet() : st.sub ? subBack() : go('now')); } catch {}
 document.addEventListener('click', e => {
   const b = e.target.closest('[data-go]'); if (b) { haptic('sel'); go(b.dataset.go); }
   if (e.target.closest('[data-open-sheet]')) openSheet();
@@ -499,6 +544,7 @@ $('sch-list').addEventListener('touchstart', e => { tx = e.touches[0].clientX; }
 $('sch-list').addEventListener('touchend', e => { if (tx == null) return; const dx = e.changedTouches[0].clientX - tx; tx = null; if (Math.abs(dx) > 60) { track('swipe', { dir: dx < 0 ? 1 : -1 }); st.selDate = addDays(st.selDate || moscowNow().iso, dx < 0 ? 1 : -1); renderSchedule(); } });
 
 // ---------- сервисы: ресурсы (каналы с лекциями и материалами) — список в resources.json
+const BAG_ICON = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14l-1 12H6z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>';
 const FOLDER_ICON = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>';
 const TG_ICON = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M21 4 3 11l6 2 2 6 3-4 5 4z"/><path d="m9 13 8-6"/></svg>';
 let resources = null;
@@ -601,6 +647,7 @@ async function renderServices() {
   renderStats();
   $('svc-home').hidden = !!st.sub;
   for (const el of document.querySelectorAll('[id^="svc-sub-"]')) el.hidden = el.id !== 'svc-sub-' + st.sub;
+  if (st.sub === 'market') { renderMarket(); if (!mk.items) mkLoad(); }
   if (!resources) {
     try { resources = await (await fetch('./resources.json', { cache: 'no-cache' })).json(); }
     catch { $('svc-res').innerHTML = '<div class="empty"><b>Не удалось загрузить</b>Проверьте интернет</div>'; return; }
@@ -696,8 +743,8 @@ $('sheet-fac').onclick = e => { const b = e.target.closest('[data-f]'); if (b) {
 $('sheet-course').onclick = e => { const b = e.target.closest('[data-c]'); if (b) { sh.course = +b.dataset.c; haptic('sel'); renderSheet(); } };
 $('sheet-q').oninput = renderSheet;
 $('sheet-close').onclick = closeSheet;
-$('scrim').onclick = () => fbOpen ? closeFb() : closeSheet();
-document.addEventListener('keydown', e => { if (e.key !== 'Escape') return; if (fbOpen) closeFb(); else if (sheetOpen) closeSheet(); });
+$('scrim').onclick = () => fbOpen ? closeFb() : mk.open ? closeMk() : closeSheet();
+document.addEventListener('keydown', e => { if (e.key !== 'Escape') return; if (fbOpen) closeFb(); else if (mk.open) closeMk(); else if (sheetOpen) closeSheet(); });
 async function pickGroup(e) {
   const b = e.target.closest('[data-g]'); if (!b) return;
   if (sh.mode === 'fav') { addFav(b.dataset.g); track('fav_add', { fav: b.dataset.g }); haptic('success'); closeSheet(); return; }
@@ -784,6 +831,218 @@ $('fb-send').onclick = async () => {
     $('fb-send').disabled = false; err('Не получилось отправить. Проверьте интернет и попробуйте ещё раз');
   }
 };
+
+// ---------- маркет: объявления студентов (только вещи). Хранит сервер бота (…/api/market/*), публикуются сразу,
+// модераторы видят каждое в теме «Маркет» и могут снять. Пока FEEDBACK_API пустой — показываем примеры.
+const MK_KINDS = { sell: 'Продам', buy: 'Куплю', free: 'Даром' };
+const MK_CATS = { form: 'Халаты и форма', books: 'Книги и атласы', tools: 'Инструменты', notes: 'Конспекты', other: 'Другое' };
+const MK_STATUS = { sold: 'продано', removed: 'снято модератором', hidden: 'скрыто по жалобам' };
+const MK_ERR = {
+  'no username': 'Чтобы покупатели могли вам написать, задайте имя пользователя: Telegram → Настройки → Имя пользователя.',
+  'too many active': 'Не больше 10 активных объявлений. Отметьте проданное или удалите старое.',
+  'too many': 'Не больше 5 новых объявлений в сутки. Попробуйте завтра.',
+  'short title': 'Название — хотя бы 3 символа.', 'no price': 'Укажите цену.', 'bad price': 'Цена — число в рублях.',
+  'bad photos': 'Не получилось обработать фото. Попробуйте другое.',
+};
+const MK_DEMO = [
+  { id: -1, kind: 'sell', cat: 'form', title: 'Халат медицинский, 46 размер', price: 900, descr: 'Носила один семестр, без пятен.', user_name: 'Пример', username: 'stgmu_helpbot', created_at: '2026-10-30T12:00:00', photos: [] },
+  { id: -2, kind: 'sell', cat: 'books', title: 'Атлас анатомии Синельникова, 3 тома', price: 2500, descr: '', user_name: 'Пример', username: 'stgmu_helpbot', created_at: '2026-10-29T18:00:00', photos: [] },
+  { id: -3, kind: 'free', cat: 'notes', title: 'Конспекты по гистологии, 1 курс', price: null, descr: 'Заберите у главного корпуса.', user_name: 'Пример', username: 'stgmu_helpbot', created_at: '2026-10-28T09:30:00', photos: [] },
+  { id: -4, kind: 'buy', cat: 'tools', title: 'Набор для препарирования', price: 1500, descr: '', user_name: 'Пример', username: 'stgmu_helpbot', created_at: '2026-10-27T20:15:00', photos: [] },
+];
+const mk = { items: null, mine: [], kind: 'all', cat: 'all', open: false, draft: null, error: '' };
+const mkApi = () => FEEDBACK_API ? FEEDBACK_API.replace(/\/feedback$/, '/market') : '';
+const mkPhoto = name => `${mkApi()}/photo/${encodeURIComponent(name)}`;
+async function mkCall(action, body = {}) {
+  const r = await fetch(`${mkApi()}/${action}`, { method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ ...body, initData: tg?.initData || '' }) });
+  const res = await r.json().catch(() => ({}));
+  if (!r.ok || !res.ok) throw new Error(res.error || r.status);
+  return res.data;
+}
+async function mkLoad() {
+  mk.error = '';
+  if (!mkApi()) mk.items = MK_DEMO;
+  else try { [mk.items, mk.mine] = await Promise.all([mkCall('list'), mkCall('mine')]); }
+  catch { mk.items = mk.items || []; mk.error = 'Не удалось загрузить объявления. Проверьте интернет.'; }
+  if (st.sub === 'market') renderMarket();
+}
+const mkPrice = it => it.kind === 'free' ? 'Даром' : it.price == null ? (it.kind === 'buy' ? 'Куплю' : 'Договорная')
+  : (it.kind === 'buy' ? 'до ' : '') + it.price.toLocaleString('ru-RU') + ' ₽';
+function mkWhen(iso) {
+  const d = iso.slice(0, 10), today = moscowNow().iso;
+  if (d === today) return 'сегодня';
+  if (d === addDays(today, -1)) return 'вчера';
+  return new Date(iso).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' });
+}
+const mkFind = id => [...(mk.items || []), ...mk.mine].find(x => x.id === id);
+function renderMarket() {
+  const kinds = [['all', 'Все'], ...Object.entries(MK_KINDS), ['mine', 'Мои']];
+  $('mk-kinds').innerHTML = kinds.map(([k, t]) => `<button class="pill${mk.kind === k ? ' sel' : ''}" data-mk-kind="${k}">${t}${k === 'mine' && mk.mine.length ? ' · ' + mk.mine.length : ''}</button>`).join('');
+  $('mk-cats').hidden = mk.kind === 'mine';
+  $('mk-cats').innerHTML = [['all', 'Все вещи'], ...Object.entries(MK_CATS)].map(([k, t]) => `<button class="pill${mk.cat === k ? ' sel' : ''}" data-mk-cat="${k}">${t}</button>`).join('');
+  if (!mk.items) { $('mk-list').innerHTML = '<div class="empty"><b>Загружаем…</b></div>'; return; }
+  const list = mk.kind === 'mine' ? mk.mine
+    : mk.items.filter(it => (mk.kind === 'all' || it.kind === mk.kind) && (mk.cat === 'all' || it.cat === mk.cat));
+  const demo = !mkApi() ? '<div class="fb-hint" style="grid-column:1/-1">Это примеры: маркет заработает, когда подключим сервер.</div>' : '';
+  const err = mk.error ? `<div class="fb-err" style="grid-column:1/-1">${esc(mk.error)}</div>` : '';
+  const empty = mk.kind === 'mine' ? '<div class="empty"><b>Объявлений пока нет</b>Нажмите «+ Объявление», чтобы продать или отдать вещь</div>'
+    : '<div class="empty"><b>Здесь пока пусто</b>Станьте первым — нажмите «+ Объявление»</div>';
+  $('mk-list').innerHTML = demo + err + (list.length ? list.map(it => {
+    const status = MK_STATUS[it.status] || (it.expired ? 'срок истёк' : '');
+    const badge = status ? `<span class="soon">${status}</span>` : it.kind !== 'sell' ? `<span class="soon">${MK_KINDS[it.kind]}</span>` : '';
+    return `<button class="mk-card${status ? ' dim' : ''}" data-mk-item="${it.id}"><span class="mk-ph">${it.photos[0] ? `<img src="${esc(mkPhoto(it.photos[0]))}" alt="" loading="lazy">` : BAG_ICON}${badge}</span>
+      <span class="ct"><div class="pr num">${esc(mkPrice(it))}</div><div class="tt">${esc(it.title)}</div><div class="mt">${esc(MK_CATS[it.cat] || '')} · ${mkWhen(it.created_at)}</div></span></button>`;
+  }).join('') : empty);
+}
+$('mk-kinds').onclick = e => { const b = e.target.closest('[data-mk-kind]'); if (b) { haptic('sel'); mk.kind = b.dataset.mkKind; track('market_filter', { v: mk.kind }); renderMarket(); } };
+$('mk-cats').onclick = e => { const b = e.target.closest('[data-mk-cat]'); if (b) { haptic('sel'); mk.cat = b.dataset.mkCat; renderMarket(); } };
+$('mk-list').onclick = e => { const b = e.target.closest('[data-mk-item]'); if (b) { haptic('sel'); mkShowItem(+b.dataset.mkItem); } };
+$('mk-new').onclick = () => { haptic('sel'); track('market_new'); mkShowForm(); };
+
+function openMk(title) {
+  $('mk-t').textContent = title;
+  $('scrim').hidden = $('mk').hidden = false;
+  requestAnimationFrame(() => { $('scrim').classList.add('open'); $('mk').classList.add('open'); });
+  mk.open = true;
+  try { tg?.BackButton?.show(); } catch {}
+}
+function closeMk() {
+  $('scrim').classList.remove('open'); $('mk').classList.remove('open'); mk.open = false;
+  setTimeout(() => { if (!mk.open && !fbOpen && !sheetOpen) { $('scrim').hidden = $('mk').hidden = true; } }, 280);
+}
+$('mk-close').onclick = closeMk;
+const mkConfirm = (text, ok) => tg?.showConfirm ? tg.showConfirm(text, yes => yes && ok()) : confirm(text) && ok();
+
+function mkShowItem(id) {
+  const it = mkFind(id); if (!it) return;
+  track('market_item', { id });
+  const status = MK_STATUS[it.status] || (it.expired ? 'срок истёк' : '');
+  const until = it.expires_at ? new Date(it.expires_at).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' }) : '';
+  let actions;
+  if (it.mine && it.status === 'active') actions = `
+    <button class="btn" data-mk-act="sold">${it.kind === 'buy' ? 'Уже купил' : 'Отметить «продано»'}</button>
+    <button class="btn ghost" data-mk-act="extend">Продлить на 30 дней${it.expired ? '' : ` · сейчас до ${until}`}</button>
+    <button class="mk-link" data-mk-act="deleted">Удалить объявление</button>`;
+  else if (it.mine && it.status === 'sold') actions = `
+    <button class="btn ghost" data-mk-act="active">Вернуть в маркет</button><button class="mk-link" data-mk-act="deleted">Удалить объявление</button>`;
+  else if (it.mine) actions = `<p class="fb-hint">Объявление ${status}. Если это ошибка — напишите через «Сообщить об ошибке».</p>`;
+  else actions = `<button class="btn" data-mk-act="write">Написать ${it.kind === 'buy' ? 'покупателю' : it.kind === 'free' ? 'автору' : 'продавцу'}</button>
+    <button class="mk-link" data-mk-act="complain">Пожаловаться</button>`;
+  $('mk-body').innerHTML = `
+    ${it.photos.length ? `<div class="mk-photos">${it.photos.map(p => `<img src="${esc(mkPhoto(p))}" alt="">`).join('')}</div>` : ''}
+    <div class="mk-price num">${esc(mkPrice(it))}</div>
+    <div class="mk-title">${esc(it.title)}</div>
+    <div class="mk-pills"><span class="soon">${MK_KINDS[it.kind]}</span><span class="soon">${esc(MK_CATS[it.cat] || '')}</span>${status ? `<span class="soon">${status}</span>` : ''}</div>
+    ${it.descr ? `<div class="mk-descr">${esc(it.descr)}</div>` : '<div style="height:12px"></div>'}
+    <div class="fb-hint">${esc(it.user_name.replace(/ \(@.*\)$/, ''))} · ${mkWhen(it.created_at)}</div>
+    <div class="fb-err" id="mk-err" hidden></div>
+    ${actions}`;
+  $('mk-body').dataset.id = id;
+  openMk(it.mine ? 'Моё объявление' : 'Объявление');
+}
+$('mk-body').addEventListener('click', async e => {
+  const b = e.target.closest('[data-mk-act]'); if (!b) return;
+  const act = b.dataset.mkAct, it = mkFind(+$('mk-body').dataset.id); if (!it) return;
+  haptic('sel');
+  if (act === 'write') {
+    track('market_contact', { id: it.id });
+    const link = `https://t.me/${it.username}`;
+    if (tg?.openTelegramLink) { tg.openTelegramLink(link); setTimeout(() => { try { tg.close(); } catch {} }, 300); } else window.open(link, '_blank');
+    return;
+  }
+  if (!mkApi()) { toast('Это пример — заработает после подключения сервера'); return; }
+  const run = async () => {
+    try {
+      if (act === 'complain') { await mkCall('complain', { id: it.id }); closeMk(); toast('Спасибо, модераторы проверят'); return; }
+      if (act === 'extend') await mkCall('extend', { id: it.id });
+      else await mkCall('status', { id: it.id, status: act });
+      haptic('success'); track('market_' + act, { id: it.id });
+      await mkLoad();
+      if (act === 'deleted') { closeMk(); toast('Объявление удалено'); } else mkShowItem(it.id);
+    } catch { $('mk-err').textContent = 'Не получилось. Проверьте интернет и попробуйте ещё раз'; $('mk-err').hidden = false; haptic('error'); }
+  };
+  if (act === 'complain') mkConfirm('Пожаловаться на объявление? Например, если это не вещь, лекарство или обман.', run);
+  else if (act === 'deleted') mkConfirm('Удалить объявление?', run);
+  else run();
+});
+
+function mkShowForm() {
+  mk.draft = { kind: 'sell', cat: 'form', photos: [] };
+  $('mk-body').innerHTML = `
+    <div class="seg" id="mkf-kind">${Object.entries(MK_KINDS).map(([k, t]) => `<button data-k="${k}">${k === 'free' ? 'Отдам даром' : t}</button>`).join('')}</div>
+    <div class="gh">Категория</div>
+    <div class="mk-pills" id="mkf-cat">${Object.entries(MK_CATS).map(([k, t]) => `<button class="pill" data-c="${k}">${t}</button>`).join('')}</div>
+    <div class="gh">Что это</div>
+    <input class="mk-in" id="mkf-title" maxlength="80" placeholder="Например: халат, 46 размер">
+    <div id="mkf-price-box"><div class="gh" id="mkf-price-l"></div><input class="mk-in num" id="mkf-price" inputmode="numeric" maxlength="7" placeholder="0"></div>
+    <div class="gh">Описание <span style="font-weight:600;color:var(--faint)">— необязательно</span></div>
+    <textarea class="fb-text" id="mkf-descr" maxlength="1000" style="min-height:90px" placeholder="Состояние, где забрать, торг"></textarea>
+    <div class="gh">Фото — до 3</div>
+    <div class="mk-thumbs" id="mkf-photos"></div>
+    <input type="file" id="mkf-file" accept="image/*" multiple hidden>
+    <p class="fb-hint" style="margin-top:14px">Только вещи: форма, книги, инструменты, конспекты. Нельзя лекарства, услуги и работы на заказ — такие объявления снимаем. Покупатели напишут вам в Telegram, объявление провисит 30 дней.</p>
+    <div class="fb-err" id="mk-err" hidden></div>
+    <button class="btn" id="mkf-send">Опубликовать</button>`;
+  mkFormSync(); mkThumbs();
+  openMk('Новое объявление');
+}
+function mkFormSync() {
+  const d = mk.draft;
+  for (const b of $('mkf-kind').children) b.classList.toggle('sel', b.dataset.k === d.kind);
+  for (const b of $('mkf-cat').children) b.classList.toggle('sel', b.dataset.c === d.cat);
+  $('mkf-price-box').hidden = d.kind === 'free';
+  $('mkf-price-l').innerHTML = d.kind === 'buy' ? 'Готов заплатить до, ₽ <span style="font-weight:600;color:var(--faint)">— необязательно</span>' : 'Цена, ₽';
+}
+function mkThumbs() {
+  $('mkf-photos').innerHTML = mk.draft.photos.map((p, i) => `<div class="mk-thumb"><img src="${p}" alt=""><button class="x" data-rm="${i}" aria-label="Убрать фото">×</button></div>`).join('')
+    + (mk.draft.photos.length < 3 ? '<div class="mk-thumb" data-add role="button" aria-label="Добавить фото">+</div>' : '');
+}
+async function mkResize(file) {  // фото уменьшаем на телефоне: до 1280 px по большей стороне, JPEG
+  const url = URL.createObjectURL(file);
+  try {
+    const img = await new Promise((ok, no) => { const i = new Image(); i.onload = () => ok(i); i.onerror = no; i.src = url; });
+    const k = Math.min(1, 1280 / Math.max(img.naturalWidth, img.naturalHeight));
+    const c = document.createElement('canvas'); c.width = Math.round(img.naturalWidth * k); c.height = Math.round(img.naturalHeight * k);
+    c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+    return c.toDataURL('image/jpeg', .82);
+  } finally { URL.revokeObjectURL(url); }
+}
+$('mk-body').addEventListener('click', e => {
+  if (!mk.draft || !$('mkf-kind')) return;
+  const k = e.target.closest('#mkf-kind [data-k]'), c = e.target.closest('#mkf-cat [data-c]');
+  if (k) { haptic('sel'); mk.draft.kind = k.dataset.k; mkFormSync(); }
+  if (c) { haptic('sel'); mk.draft.cat = c.dataset.c; mkFormSync(); }
+  const rm = e.target.closest('[data-rm]');
+  if (rm) { mk.draft.photos.splice(+rm.dataset.rm, 1); mkThumbs(); return; }
+  if (e.target.closest('[data-add]')) $('mkf-file').click();
+  if (e.target.closest('#mkf-send')) mkSend();
+});
+$('mk-body').addEventListener('change', async e => {
+  if (e.target.id !== 'mkf-file') return;
+  for (const f of [...e.target.files].slice(0, 3 - mk.draft.photos.length)) {
+    try { mk.draft.photos.push(await mkResize(f)); } catch { toast('Не получилось открыть фото'); }
+  }
+  e.target.value = ''; mkThumbs();
+});
+async function mkSend() {
+  const d = mk.draft, err = m => { $('mk-err').textContent = m; $('mk-err').hidden = false; haptic('error'); };
+  const title = $('mkf-title').value.trim(), price = $('mkf-price').value.replace(/\D/g, '');
+  if (title.length < 3) return err(MK_ERR['short title']);
+  if (d.kind === 'sell' && !price) return err(MK_ERR['no price']);
+  if (!mkApi()) return err('Это тестовая версия: публиковать можно будет после подключения сервера.');
+  $('mkf-send').disabled = true;
+  try {
+    const it = await mkCall('create', { kind: d.kind, cat: d.cat, title, descr: $('mkf-descr').value.trim(),
+      price: d.kind === 'free' ? null : price || null, photos: d.photos });
+    haptic('success'); track('market_post', { kind: d.kind, cat: d.cat, photos: d.photos.length });
+    mk.draft = null; closeMk(); toast('Объявление опубликовано');
+    mk.kind = 'mine'; await mkLoad();
+    if (!mk.mine.some(x => x.id === it.id)) mk.mine.unshift(it);
+  } catch (e) {
+    $('mkf-send').disabled = false; err(MK_ERR[e.message] || 'Не получилось отправить. Проверьте интернет и попробуйте ещё раз');
+  }
+}
 
 async function selectGroup(id) { st.data = await S.loadGroup(id); st.group = st.data.group; st.selDate = null; }
 
