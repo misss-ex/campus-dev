@@ -207,9 +207,10 @@
   .sheet-title { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
   .sheet-title b { font-size: 18px; font-weight: 800; }
   .search { position: relative; display: block; }
-  .search input { width: 100%; height: 44px; padding: 0 14px 0 40px; border-radius: 14px; border: 1px solid var(--line-2); background: var(--card); outline: none; }
+  .search input { width: 100%; height: 44px; margin: 0; padding: 0 14px 0 40px; border-radius: 14px; border: 1px solid var(--line-2); background: var(--card); outline: none; -webkit-appearance: none; appearance: none; }
+  .search input::-webkit-search-decoration, .search input::-webkit-search-results-button { -webkit-appearance: none; }
   .search input:focus { border-color: var(--accent); }
-  .search svg { position: absolute; left: 13px; top: 13px; width: 18px; height: 18px; color: var(--faint); }
+  .search svg { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); width: 18px; height: 18px; color: var(--faint); pointer-events: none; }
   .tabs-row { display: flex; gap: 6px; overflow-x: auto; margin-top: 10px; scrollbar-width: none; }
   .tabs-row::-webkit-scrollbar { display: none; }
   .pill { flex: none; height: 32px; padding: 0 12px; border-radius: 999px; background: var(--card); border: 1px solid var(--line); font-size: 13px; font-weight: 700; color: var(--muted); white-space: nowrap; }
@@ -328,7 +329,7 @@
     <div class="cards">
       <button class="group-card" data-fb="report">
         <span class="avatar"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13 7l4 4"/></svg></span>
-        <span class="gt"><b>Ошибка в расписании?</b><span>Напишите — мы поправим</span></span>
+        <span class="gt"><b>Сообщить об ошибке</b><span>В расписании, приложении или маркете</span></span>
         <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg>
       </button>
       <button class="group-card" data-fb="idea">
@@ -361,6 +362,7 @@
     <div class="sheet-title"><b id="fb-t"></b><button class="icon-btn" id="fb-close" aria-label="Закрыть"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
   </div>
   <div class="sheet-body">
+    <div class="tabs-row" id="fb-area" style="margin:0 0 12px"></div>
     <p class="fb-hint" id="fb-hint"></p>
     <textarea class="fb-text" id="fb-text" maxlength="2000"></textarea>
     <div class="fb-err" id="fb-err" hidden></div>
@@ -780,13 +782,27 @@ $('set-share').onclick = () => {
 // Сервер проверяет подпись initData, сохраняет заявку и пересылает модераторам.
 const FEEDBACK_API = 'https://bot.klotyp.xyz/api/feedback';  // сервер бота (VPS stgmu-bot)
 const FB = {
-  report: { title: 'Ошибка в расписании', hint: 'Укажите дату или день недели, время пары и что не так. Группа подставится сама.', ph: 'Например: чт 05.11, 11:00 — нет физкультуры' },
+  report: { title: 'Сообщить об ошибке' },
   idea: { title: 'Идея для приложения', hint: 'Чего не хватает? Что было бы удобно? Все идеи читаем.', ph: 'Например: напоминание за 10 минут до пары' },
 };
-let fbOpen = false, fbKind = 'report';
+// где ошибка: подсказка и пример меняются; раздел пишется в начале заявки, чтобы модераторы сразу видели
+const FB_AREAS = {
+  schedule: { name: 'Расписание', hint: 'Укажите дату или день недели, время пары и что не так. Группа подставится сама.', ph: 'Например: чт 05.11, 11:00 — нет физкультуры' },
+  app: { name: 'Приложение', hint: 'Что не работает или выглядит не так? На каком экране и что вы нажимали?', ph: 'Например: в «Неделе» не листается на следующую' },
+  market: { name: 'Маркет', hint: 'Что случилось с объявлением или фото? Если про чужое объявление — лучше «Пожаловаться» в нём самом.', ph: 'Например: не загружается фото при создании' },
+  other: { name: 'Другое', hint: 'Опишите, что не так, — прочитаем и ответим в чате бота.', ph: 'Например: бот не отвечает на /start' },
+};
+let fbOpen = false, fbKind = 'report', fbArea = 'schedule';
+function renderFbArea() {
+  const a = FB_AREAS[fbArea];
+  $('fb-area').innerHTML = Object.entries(FB_AREAS).map(([k, x]) => `<button class="pill${k === fbArea ? ' sel' : ''}" data-fb-area="${k}">${x.name}</button>`).join('');
+  $('fb-hint').textContent = a.hint; $('fb-text').placeholder = a.ph;
+}
+$('fb-area').onclick = e => { const b = e.target.closest('[data-fb-area]'); if (!b) return; fbArea = b.dataset.fbArea; haptic('sel'); renderFbArea(); };
 function openFb(kind) {
   fbKind = kind; const c = FB[kind];
-  $('fb-t').textContent = c.title; $('fb-hint').textContent = c.hint; $('fb-text').placeholder = c.ph;
+  $('fb-t').textContent = c.title; $('fb-area').hidden = kind !== 'report';
+  if (kind === 'report') { fbArea = 'schedule'; renderFbArea(); } else { $('fb-hint').textContent = c.hint; $('fb-text').placeholder = c.ph; }
   $('fb-err').hidden = true; $('fb-send').disabled = false;
   $('scrim').hidden = $('fb').hidden = false;
   requestAnimationFrame(() => { $('scrim').classList.add('open'); $('fb').classList.add('open'); });
@@ -823,7 +839,7 @@ $('fb-send').onclick = async () => {
   $('fb-send').disabled = true;
   try {
     const r = await fetch(FEEDBACK_API, { method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ kind: fbKind, text, group: slug, initData: tg?.initData || '' }) });
+      body: JSON.stringify({ kind: fbKind, text: fbKind === 'report' ? `[${FB_AREAS[fbArea].name}] ${text}` : text, group: slug, initData: tg?.initData || '' }) });
     const res = await r.json().catch(() => ({}));
     if (!r.ok || !res.ok) throw new Error(res.error || r.status);
     $('fb-text').value = ''; closeFb(); haptic('success');
