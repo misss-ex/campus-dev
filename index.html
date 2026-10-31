@@ -945,7 +945,6 @@ function mkShowItem(id) {
   let actions;
   if (it.mine && it.status === 'active') actions = `
     <button class="btn" data-mk-act="sold">${it.kind === 'buy' ? 'Уже купил' : 'Отметить «продано»'}</button>
-    <button class="btn ghost" data-mk-act="extend">Продлить на 30 дней${it.expired ? '' : ` · сейчас до ${until}`}</button>
     <button class="mk-link" data-mk-act="deleted">Удалить объявление</button>`;
   else if (it.mine && it.status === 'sold') actions = `
     <button class="btn ghost" data-mk-act="active">Вернуть в маркет</button><button class="mk-link" data-mk-act="deleted">Удалить объявление</button>`;
