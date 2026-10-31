@@ -50,7 +50,8 @@
   /* вертикальные столбики: одна серия — один цвет, подпись по нажатию */
   .vb { position: relative; }
   .vb svg { display: block; width: 100%; height: 120px; overflow: visible; }
-  .vb .bar { fill: var(--accent); }
+  .vb .bar { fill: var(--accent); pointer-events: none; }
+  .vb svg { touch-action: pan-y; cursor: pointer; }
   .vb .hit { fill: transparent; cursor: pointer; }
   .vb .hit:hover + .bar, .vb .bar.on { fill: var(--text); }
   .vb .base { stroke: var(--line-2); stroke-width: 1; }
@@ -158,18 +159,31 @@ function vbars(values, labels, every = 1) {
     <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">${bars}<line class="base" x1="0" x2="${W}" y1="${H}" y2="${H}"/><text class="max" x="0" y="8">${max}</text></svg>
     <div class="lbl">${lbl}</div></div>`;
 }
-document.addEventListener('pointerover', showTip);
-document.addEventListener('pointerdown', showTip);
-function showTip(e) {
-  const hit = e.target.closest?.('.vb .hit');
+// подсказка — по положению пальца/мыши на всей ширине графика: столбик выбирается по X, можно вести пальцем
+let tipKey = '';
+function hideTip() {
+  tipKey = '';
   document.querySelectorAll('.tip').forEach(t => t.remove());
   document.querySelectorAll('.vb .bar.on').forEach(b => b.classList.remove('on'));
-  if (!hit) return;
-  const vb = hit.closest('.vb'), i = +hit.dataset.i, v = JSON.parse(vb.dataset.v)[i], l = JSON.parse(vb.dataset.l)[i];
-  hit.nextElementSibling.classList.add('on');
-  const r = hit.getBoundingClientRect(), base = vb.getBoundingClientRect();
-  vb.insertAdjacentHTML('beforeend', `<div class="tip num" style="left:${r.left - base.left + r.width / 2}px">${esc(l)}: ${v}</div>`);
 }
+function showTip(e) {
+  const svg = e.target.closest?.('.vb svg');
+  if (!svg) { if (e.type === 'pointerdown') hideTip(); return; }
+  const vb = svg.closest('.vb'), vals = JSON.parse(vb.dataset.v), n = vals.length;
+  const sr = svg.getBoundingClientRect(), i = Math.min(n - 1, Math.max(0, Math.floor((e.clientX - sr.left) / sr.width * n)));
+  const key = vb.dataset.l + i; if (key === tipKey) return;
+  hideTip(); tipKey = key;
+  const l = JSON.parse(vb.dataset.l)[i], hits = svg.querySelectorAll('.hit');
+  hits[i]?.nextElementSibling?.classList.add('on');
+  const base = vb.getBoundingClientRect(), cx = sr.left - base.left + (i + .5) * sr.width / n;
+  vb.insertAdjacentHTML('beforeend', `<div class="tip num">${esc(l)}: ${vals[i]}</div>`);
+  const tip = vb.lastElementChild, half = tip.offsetWidth / 2;  // у краёв не вылезать за график
+  tip.style.left = Math.min(base.width - half, Math.max(half, cx)) + 'px';
+}
+document.addEventListener('pointerdown', showTip);
+document.addEventListener('pointermove', e => { if (e.pointerType === 'mouse' || e.buttons) showTip(e); });
+document.addEventListener('pointerleave', hideTip);
+document.addEventListener('pointerout', e => { if (e.pointerType === 'mouse' && e.target.closest?.('.vb svg') && !e.relatedTarget?.closest?.('.vb svg')) hideTip(); });
 function hbars(rows, total) {
   if (!rows?.length) return '<div class="empty">Пока нет данных</div>';
   const max = Math.max(...rows.map(r => r[1]), 1);
