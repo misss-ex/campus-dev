@@ -1,25 +1,77 @@
 {
   "sections": [
     {
-      "title": "Лекции по курсам",
+      "title": "Лекции · Лечебное дело",
       "items": [
-        { "title": "Лечебное дело · 2 курс", "url": "https://t.me/aaworurvj" },
-        { "title": "Педиатрия · 3 курс", "url": "https://t.me/pediatrylekcii" },
-        { "title": "Стоматология · 1 курс", "url": "https://t.me/stomat1st" }
+        { "title": "2 курс", "url": "https://t.me/aaworurvj" },
+        { "title": "3 курс", "url": "https://t.me/leekkcciii" },
+        { "title": "4 курс", "url": "https://t.me/lekcii_3kurs_lech" },
+        { "title": "5 курс", "url": "https://t.me/lechleckii" },
+        { "title": "5 курс", "url": "https://t.me/lech4kyrs", "note": "второй канал" }
       ]
     },
     {
-      "title": "Анатомия · 1–2 курс",
+      "title": "Лекции · Педиатрия",
       "items": [
-        { "title": "Анатомия", "url": "https://t.me/anatomy_stgmy", "note": "видеоразборы" },
-        { "title": "Normal anatomy", "url": "https://t.me/normalnayanatomia", "note": "видеоразборы" }
+        { "title": "2 курс", "url": "https://t.me/L0reAsbxFJQyNWFi" },
+        { "title": "3 курс", "url": "https://t.me/pediatrylekcii" },
+        { "title": "4 курс", "url": "https://t.me/pftt44" },
+        { "title": "5 курс", "url": "https://t.me/btslubimki" },
+        { "title": "5 курс", "url": "https://t.me/+xpjqqHVfUtNkZDJi", "note": "второй канал" }
+      ]
+    },
+    {
+      "title": "Лекции · Стоматология",
+      "items": [
+        { "title": "1 курс", "url": "https://t.me/stomat1st" },
+        { "title": "2 курс", "url": "https://t.me/stomat_2kurs" },
+        { "title": "3 курс", "url": "https://t.me/stgmustom" },
+        { "title": "4 курс", "url": "https://t.me/stomlek" }
+      ]
+    },
+    {
+      "title": "Анатомия · видео для 1–2 курса",
+      "items": [
+        { "title": "Normal anatomy", "url": "https://t.me/normalnayanatomia" },
+        { "title": "Анатомия", "url": "https://t.me/anatomy_stgmy" },
+        { "title": "Артрология", "url": "https://t.me/arthrology111" },
+        { "title": "Миология", "url": "https://t.me/myology111" },
+        { "title": "Спланхнология", "url": "https://t.me/splanchnology111" },
+        { "title": "Подготовка к анатомии", "url": "https://t.me/anatom_75" }
       ]
     },
     {
       "title": "По предметам",
       "items": [
         { "title": "Латинский", "url": "https://t.me/lat_stgmu" },
+        { "title": "Гистология", "url": "https://t.me/bio_zochot" },
+        { "title": "Гистология", "url": "https://t.me/histologystgmu" },
+        { "title": "Гистология", "url": "https://t.me/stgmy_gista" },
         { "title": "Биохимия", "url": "https://t.me/stgmy_bh" }
+      ]
+    },
+    {
+      "title": "Тесты",
+      "items": [
+        { "title": "Треш (тесты) 1", "url": "https://t.me/+y4Pt6D_v4lYxZDcy" },
+        { "title": "Треш (тесты) 2", "url": "https://t.me/+V_SFM7x7EBI1YmMy" },
+        { "title": "Треш (тесты) 2", "url": "https://t.me/treshtest_2", "note": "второй канал" },
+        { "title": "Треш (тесты) 3", "url": "https://t.me/treshtest3_75" }
+      ]
+    },
+    {
+      "title": "Материалы и помощь",
+      "items": [
+        { "title": "СтГМУ 1 курс материалы", "url": "https://t.me/stgmumaterial" },
+        { "title": "Помогалка", "url": "https://t.me/zachetpobio" },
+        { "title": "Студенты-медики СтГМУ", "url": "https://t.me/medicine_ll" },
+        { "title": "Supermedbooks", "url": "https://t.me/supermedbook" },
+        { "title": "Мед", "url": "https://t.me/med203456" },
+        { "title": "Лаборатория помощи студентов", "url": "https://t.me/labbbb_monster" },
+        { "title": "Материалы для учёбы", "url": "https://t.me/offkfncjjdsk" },
+        { "title": "Материалы для медиков", "url": "https://t.me/booksmedic2" },
+        { "title": "Материалы для пар", "url": "https://t.me/materialhhk" },
+        { "title": "СтГМУ файлы", "url": "https://t.me/stgmufail" }
       ]
     }
   ]
