@@ -841,15 +841,15 @@ $('fb-send').onclick = async () => {
   $('fb-send').disabled = true;
   try {
     const r = await fetch(FEEDBACK_API, { method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ kind: fbKind === 'resource' ? 'idea' : fbKind,  // ресурс — в тему «Идеи» с пометкой
-        text: fbKind === 'report' ? `[${FB_AREAS[fbArea].name}] ${text}` : fbKind === 'resource' ? `[Ресурс] ${text}` : text,
+      body: JSON.stringify({ kind: fbKind,  // report → «Ошибки в расписании» / «Ошибки», resource → «Ресурсы», idea → «Идеи»
+        text: fbKind === 'report' ? `[${FB_AREAS[fbArea].name}] ${text}` : text,
         group: slug, initData: tg?.initData || '' }) });
     const res = await r.json().catch(() => ({}));
     if (res.error === 'too many') { $('fb-send').disabled = false; return err(`Вы уже отправили много сообщений. Попробуйте ${res.when || 'позже'}`); }
     if (res.error === 'too long') { $('fb-send').disabled = false; return err('Слишком длинно — сократите до 1000 символов'); }
     if (!r.ok || !res.ok) throw new Error(res.error || r.status);
     $('fb-text').value = ''; closeFb(); haptic('success');
-    toast(fbKind === 'report' ? `Спасибо! Заявка №${res.id} принята` : fbKind === 'resource' ? 'Спасибо! Проверим и добавим' : 'Спасибо за идею!');
+    toast(fbKind === 'report' ? 'Спасибо! Заявка принята' : fbKind === 'resource' ? 'Спасибо! Проверим и добавим' : 'Спасибо за идею!');
   } catch {
     $('fb-send').disabled = false; err('Не получилось отправить. Проверьте интернет и попробуйте ещё раз');
   }
