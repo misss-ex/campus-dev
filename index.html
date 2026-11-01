@@ -877,7 +877,7 @@ const MK_DEMO = [
   { id: -3, kind: 'free', cat: 'notes', title: 'Конспекты по гистологии, 1 курс', price: null, descr: 'Заберите у главного корпуса.', user_name: 'Пример', username: 'stgmu_helpbot', created_at: '2026-10-28T09:30:00', photos: [] },
   { id: -4, kind: 'buy', cat: 'tools', title: 'Набор для препарирования', price: 1500, descr: '', user_name: 'Пример', username: 'stgmu_helpbot', created_at: '2026-10-27T20:15:00', photos: [] },
 ];
-const mk = { items: null, mine: [], kind: 'all', cat: 'all', q: '', open: false, draft: null, error: '' };
+const mk = { items: null, mine: [], kind: 'all', cat: 'all', q: '', open: false, draft: null, error: '', banned: false };
 const mkApi = () => FEEDBACK_API ? FEEDBACK_API.replace(/\/feedback$/, '/market') : '';
 const mkPhoto = name => `${mkApi()}/photo/${encodeURIComponent(name)}`;
 async function mkCall(action, body = {}) {
@@ -891,7 +891,11 @@ async function mkLoad() {
   mk.error = '';
   if (!mkApi()) mk.items = MK_DEMO;
   else try { [mk.items, mk.mine] = await Promise.all([mkCall('list'), mkCall('mine')]); }
-  catch { mk.items = mk.items || []; mk.error = 'Не удалось загрузить объявления. Проверьте интернет.'; }
+  catch (e) {
+    mk.items = mk.items || [];
+    if (e.message === 'banned') { mk.banned = true; mk.items = []; mk.mine = []; }  // модератор закрыл Маркет
+    else mk.error = 'Не удалось загрузить объявления. Проверьте интернет.';
+  }
   if (st.sub === 'market') renderMarket();
 }
 const mkPrice = it => it.kind === 'free' ? 'Даром' : it.price == null ? (it.kind === 'buy' ? 'Куплю' : 'Договорная')
@@ -904,6 +908,11 @@ function mkWhen(iso) {
 }
 const mkFind = id => [...(mk.items || []), ...mk.mine].find(x => x.id === id);
 function renderMarket() {
+  for (const el of [$('mk-new'), $('mk-q').closest('.search'), $('mk-kinds'), $('mk-cats')]) el.hidden = mk.banned;
+  if (mk.banned) {
+    $('mk-list').innerHTML = '<div class="empty" style="grid-column:1/-1"><b>Доступ к Маркету закрыт</b>За нарушение правил: реклама, услуги или неприличные картинки. Если это ошибка — напишите через «Сообщить об ошибке» в Настройках.</div>';
+    return;
+  }
   const kinds = [['all', 'Все'], ...Object.entries(MK_KINDS), ['mine', 'Мои']];
   $('mk-kinds').innerHTML = kinds.map(([k, t]) => `<button class="pill${mk.kind === k ? ' sel' : ''}" data-mk-kind="${k}">${t}${k === 'mine' && mk.mine.length ? ' · ' + mk.mine.length : ''}</button>`).join('');
   $('mk-cats').hidden = mk.kind === 'mine';
