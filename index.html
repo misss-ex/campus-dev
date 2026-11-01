@@ -364,7 +364,7 @@
   <div class="sheet-body">
     <div class="tabs-row" id="fb-area" style="margin:0 0 12px"></div>
     <p class="fb-hint" id="fb-hint"></p>
-    <textarea class="fb-text" id="fb-text" maxlength="2000"></textarea>
+    <textarea class="fb-text" id="fb-text" maxlength="1000"></textarea>
     <div class="fb-err" id="fb-err" hidden></div>
     <button class="btn" id="fb-send">Отправить</button>
   </div>
@@ -841,6 +841,8 @@ $('fb-send').onclick = async () => {
     const r = await fetch(FEEDBACK_API, { method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ kind: fbKind, text: fbKind === 'report' ? `[${FB_AREAS[fbArea].name}] ${text}` : text, group: slug, initData: tg?.initData || '' }) });
     const res = await r.json().catch(() => ({}));
+    if (res.error === 'too many') { $('fb-send').disabled = false; return err(`Вы уже отправили много сообщений. Попробуйте ${res.when || 'позже'}`); }
+    if (res.error === 'too long') { $('fb-send').disabled = false; return err('Слишком длинно — сократите до 1000 символов'); }
     if (!r.ok || !res.ok) throw new Error(res.error || r.status);
     $('fb-text').value = ''; closeFb(); haptic('success');
     toast(fbKind === 'report' ? `Спасибо! Заявка №${res.id} принята` : 'Спасибо за идею!');
