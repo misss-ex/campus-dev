@@ -299,6 +299,13 @@
       <header class="top"><div><button class="eyebrow back" data-sub-close id="svc-res-back">‹ Сервисы</button><h1 id="svc-res-h">Ресурсы</h1></div></header>
       <p class="svc-sub" id="svc-res-p">Каналы с лекциями и материалами для учёбы.</p>
       <div id="svc-res"></div>
+      <div class="cards" style="margin-top:22px">
+        <button class="group-card" data-fb="resource">
+          <span class="avatar"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span>
+          <span class="gt"><b>Предложить ресурс</b><span>Знаете полезный канал или чат? Пришлите ссылку</span></span>
+          <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg>
+        </button>
+      </div>
     </div>
   </section>
 
@@ -783,6 +790,7 @@ $('set-share').onclick = () => {
 const FEEDBACK_API = 'https://bot.klotyp.xyz/api/feedback';  // сервер бота (VPS stgmu-bot)
 const FB = {
   report: { title: 'Сообщить об ошибке' },
+  resource: { title: 'Предложить ресурс', hint: 'Ссылка на канал или чат и для кого он: факультет, курс, предмет. Проверим и добавим.', ph: 'Например: t.me/… — лекции по биохимии, Лечебное, 2 курс' },
   idea: { title: 'Идея для приложения', hint: 'Чего не хватает? Что было бы удобно? Все идеи читаем.', ph: 'Например: напоминание за 10 минут до пары' },
 };
 // где ошибка: подсказка и пример меняются; раздел пишется в начале заявки, чтобы модераторы сразу видели
@@ -821,6 +829,7 @@ function toast(text) {
 }
 function openBotFallback(kind) {  // временно, пока у бота нет публичного адреса: заявка через чат бота
   const slug = groupInfo(st.group)?.slug;
+  if (kind === 'resource') kind = 'idea';
   const link = `https://t.me/${BOT}?start=${kind}${slug && kind === 'report' ? '_' + slug : ''}`;
   if (!tg?.openTelegramLink) { window.open(link, '_blank'); return; }
   tg.openTelegramLink(link);
@@ -839,13 +848,15 @@ $('fb-send').onclick = async () => {
   $('fb-send').disabled = true;
   try {
     const r = await fetch(FEEDBACK_API, { method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ kind: fbKind, text: fbKind === 'report' ? `[${FB_AREAS[fbArea].name}] ${text}` : text, group: slug, initData: tg?.initData || '' }) });
+      body: JSON.stringify({ kind: fbKind === 'resource' ? 'idea' : fbKind,  // ресурс — в тему «Идеи» с пометкой
+        text: fbKind === 'report' ? `[${FB_AREAS[fbArea].name}] ${text}` : fbKind === 'resource' ? `[Ресурс] ${text}` : text,
+        group: slug, initData: tg?.initData || '' }) });
     const res = await r.json().catch(() => ({}));
     if (res.error === 'too many') { $('fb-send').disabled = false; return err(`Вы уже отправили много сообщений. Попробуйте ${res.when || 'позже'}`); }
     if (res.error === 'too long') { $('fb-send').disabled = false; return err('Слишком длинно — сократите до 1000 символов'); }
     if (!r.ok || !res.ok) throw new Error(res.error || r.status);
     $('fb-text').value = ''; closeFb(); haptic('success');
-    toast(fbKind === 'report' ? `Спасибо! Заявка №${res.id} принята` : 'Спасибо за идею!');
+    toast(fbKind === 'report' ? `Спасибо! Заявка №${res.id} принята` : fbKind === 'resource' ? 'Спасибо! Проверим и добавим' : 'Спасибо за идею!');
   } catch {
     $('fb-send').disabled = false; err('Не получилось отправить. Проверьте интернет и попробуйте ещё раз');
   }
