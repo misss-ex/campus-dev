@@ -858,7 +858,13 @@ $('fb-send').onclick = async () => {
 // ---------- маркет: объявления студентов (только вещи). Хранит сервер бота (…/api/market/*), публикуются сразу,
 // модераторы видят каждое в теме «Маркет» и могут снять. Пока FEEDBACK_API пустой — показываем примеры.
 const MK_KINDS = { sell: 'Продам', buy: 'Куплю', free: 'Даром' };
-const MK_CATS = { form: 'Халаты и форма', books: 'Книги и атласы', tools: 'Инструменты', notes: 'Конспекты', other: 'Другое' };
+const MK_CATS = { workbooks: 'Рабочие тетради', notes: 'Конспекты', books: 'Учебные материалы', tools: 'Инструменты', form: 'Халаты и формы', other: 'Другое' };
+// фильтры: «Все вещи» первыми, дальше — где больше активных объявлений (при равенстве — порядок выше), «Другое» в конце
+function mkCatOrder() {
+  const n = {}; for (const it of mk.items || []) if (it.status === 'active' && !it.expired) n[it.cat] = (n[it.cat] || 0) + 1;
+  const keys = Object.keys(MK_CATS).filter(k => k !== 'other');
+  return [...keys.sort((a, b) => (n[b] || 0) - (n[a] || 0) || keys.indexOf(a) - keys.indexOf(b)), 'other'];
+}
 const MK_STATUS = { sold: 'продано', removed: 'снято модератором', hidden: 'скрыто по жалобам' };
 const MK_ERR = {
   'no username': 'Чтобы покупатели могли вам написать, задайте имя пользователя: Telegram → Настройки → Имя пользователя.',
@@ -903,7 +909,7 @@ function renderMarket() {
   const kinds = [['all', 'Все'], ...Object.entries(MK_KINDS), ['mine', 'Мои']];
   $('mk-kinds').innerHTML = kinds.map(([k, t]) => `<button class="pill${mk.kind === k ? ' sel' : ''}" data-mk-kind="${k}">${t}${k === 'mine' && mk.mine.length ? ' · ' + mk.mine.length : ''}</button>`).join('');
   $('mk-cats').hidden = mk.kind === 'mine';
-  $('mk-cats').innerHTML = [['all', 'Все вещи'], ...Object.entries(MK_CATS)].map(([k, t]) => `<button class="pill${mk.cat === k ? ' sel' : ''}" data-mk-cat="${k}">${t}</button>`).join('');
+  $('mk-cats').innerHTML = [['all', 'Все вещи'], ...mkCatOrder().map(k => [k, MK_CATS[k]])].map(([k, t]) => `<button class="pill${mk.cat === k ? ' sel' : ''}" data-mk-cat="${k}">${t}</button>`).join('');
   if (!mk.items) { $('mk-list').innerHTML = '<div class="empty"><b>Загружаем…</b></div>'; return; }
   const words = mk.q.toLowerCase().replace(/ё/g, 'е').split(/\s+/).filter(Boolean);
   const found = it => { const t = it.title.toLowerCase().replace(/ё/g, 'е'); return words.every(w => t.includes(w)); };
