@@ -40,6 +40,10 @@
   :root[data-accent="pine"] { --accent: #F7F3E3; --accent-ink: #1B4332; --accent-soft: rgba(247, 243, 227, .12); --glow: rgba(247, 243, 227, .14); --t-lecture: #F7F3E3; }
   :root[data-accent="pine"]:not([data-mode="light"]) { --bg: #0f261c; --bg-2: #133023; --card: #1B4332; --card-2: #22503c; --line: rgba(247, 243, 227, .09); --line-2: rgba(247, 243, 227, .18); --text: #F7F3E3; --muted: #b5bba5; --faint: #7d8a78; }
   :root[data-mode="light"][data-accent="pine"] { --bg: #F7F3E3; --bg-2: #efe9d2; --card: #fffdf6; --card-2: #f3eedb; --line: rgba(27, 67, 50, .1); --line-2: rgba(27, 67, 50, .2); --text: #1B4332; --muted: #5d6f62; --faint: #9aa294; --accent: #1B4332; --accent-ink: #F7F3E3; --accent-soft: rgba(27, 67, 50, .08); --glow: rgba(27, 67, 50, .12); --t-lecture: #1B4332; --shadow: 0 8px 24px rgba(27, 67, 50, .1); }
+  /* «Графит»: графит #2F3640 + тёплый белый #FFFDF5 */
+  :root[data-accent="graphite"] { --accent: #FFFDF5; --accent-ink: #2F3640; --accent-soft: rgba(255, 253, 245, .12); --glow: rgba(255, 253, 245, .12); --t-lecture: #FFFDF5; }
+  :root[data-accent="graphite"]:not([data-mode="light"]) { --bg: #1d2228; --bg-2: #242a32; --card: #2F3640; --card-2: #38404c; --line: rgba(255, 253, 245, .08); --line-2: rgba(255, 253, 245, .16); --text: #FFFDF5; --muted: #aeb2b6; --faint: #767d86; }
+  :root[data-mode="light"][data-accent="graphite"] { --bg: #FFFDF5; --bg-2: #f5f2e7; --card: #ffffff; --card-2: #f7f5ee; --line: rgba(47, 54, 64, .09); --line-2: rgba(47, 54, 64, .18); --text: #2F3640; --muted: #646b74; --faint: #9da2a8; --accent: #2F3640; --accent-ink: #FFFDF5; --accent-soft: rgba(47, 54, 64, .08); --glow: rgba(47, 54, 64, .1); --t-lecture: #2F3640; --shadow: 0 8px 24px rgba(47, 54, 64, .1); }
 
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   html, body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.45 var(--font); }
@@ -130,7 +134,7 @@
   .seg { display: grid; grid-template-columns: repeat(3, 1fr); padding: 4px; gap: 4px; border-radius: 14px; background: var(--card); border: 1px solid var(--line); }
   .seg button { height: 36px; border-radius: 10px; font-size: 13px; font-weight: 700; color: var(--muted); }
   .seg button.sel { background: var(--card-2); color: var(--text); box-shadow: 0 1px 0 var(--line-2) inset, 0 2px 8px rgba(0, 0, 0, .15); }
-  .swatches { display: flex; gap: 10px; }
+  .swatches { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   .swatch { flex: 1; min-width: 0; display: flex; align-items: center; gap: 8px; padding: 10px; border-radius: 14px; background: var(--card); border: 1px solid var(--line); font-weight: 700; font-size: 13px; }
   .swatch i { width: 20px; height: 20px; border-radius: 50%; }
   .swatch.sel { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
@@ -321,6 +325,7 @@
       <button class="swatch" data-v="mint"><i style="background:#7fe0b5"></i>Мята</button>
       <button class="swatch" data-v="lavender"><i style="background:#c4b3ff"></i>Лаванда</button>
       <button class="swatch" data-v="pine"><i style="background:linear-gradient(135deg,#1B4332 50%,#F7F3E3 50%);box-shadow:inset 0 0 0 1px rgba(27,67,50,.35)"></i>Хвоя</button>
+      <button class="swatch" data-v="graphite"><i style="background:linear-gradient(135deg,#2F3640 50%,#FFFDF5 50%);box-shadow:inset 0 0 0 1px rgba(47,54,64,.35)"></i>Графит</button>
     </div>
     <div class="label">Поделиться</div>
     <button class="group-card" id="set-share">
