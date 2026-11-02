@@ -36,6 +36,10 @@
     --warn: #b9770f; --shadow: 0 8px 24px rgba(20, 60, 45, .08);
   }
   :root[data-mode="light"][data-accent="lavender"] { --accent: #6f55e8; --accent-soft: rgba(111, 85, 232, .1); --glow: rgba(111, 85, 232, .18); --t-lecture: #6f55e8; --card-2: #f7f5ff; }
+  /* «Хвоя»: хвойный #1B4332 + слоновая кость #F7F3E3 */
+  :root[data-accent="pine"] { --accent: #F7F3E3; --accent-ink: #1B4332; --accent-soft: rgba(247, 243, 227, .12); --glow: rgba(247, 243, 227, .14); --t-lecture: #F7F3E3; }
+  :root[data-accent="pine"]:not([data-mode="light"]) { --bg: #0f261c; --bg-2: #133023; --card: #1B4332; --card-2: #22503c; --line: rgba(247, 243, 227, .09); --line-2: rgba(247, 243, 227, .18); --text: #F7F3E3; --muted: #b5bba5; --faint: #7d8a78; }
+  :root[data-mode="light"][data-accent="pine"] { --bg: #F7F3E3; --bg-2: #efe9d2; --card: #fffdf6; --card-2: #f3eedb; --line: rgba(27, 67, 50, .1); --line-2: rgba(27, 67, 50, .2); --text: #1B4332; --muted: #5d6f62; --faint: #9aa294; --accent: #1B4332; --accent-ink: #F7F3E3; --accent-soft: rgba(27, 67, 50, .08); --glow: rgba(27, 67, 50, .12); --t-lecture: #1B4332; --shadow: 0 8px 24px rgba(27, 67, 50, .1); }
 
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   html, body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.45 var(--font); }
@@ -127,7 +131,7 @@
   .seg button { height: 36px; border-radius: 10px; font-size: 13px; font-weight: 700; color: var(--muted); }
   .seg button.sel { background: var(--card-2); color: var(--text); box-shadow: 0 1px 0 var(--line-2) inset, 0 2px 8px rgba(0, 0, 0, .15); }
   .swatches { display: flex; gap: 10px; }
-  .swatch { flex: 1; display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 14px; background: var(--card); border: 1px solid var(--line); font-weight: 700; font-size: 13px; }
+  .swatch { flex: 1; min-width: 0; display: flex; align-items: center; gap: 8px; padding: 10px; border-radius: 14px; background: var(--card); border: 1px solid var(--line); font-weight: 700; font-size: 13px; }
   .swatch i { width: 20px; height: 20px; border-radius: 50%; }
   .swatch.sel { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
   .about { margin-top: 26px; text-align: center; font-size: 12px; color: var(--faint); }
@@ -316,6 +320,7 @@
     <div class="swatches" id="set-accent">
       <button class="swatch" data-v="mint"><i style="background:#7fe0b5"></i>Мята</button>
       <button class="swatch" data-v="lavender"><i style="background:#c4b3ff"></i>Лаванда</button>
+      <button class="swatch" data-v="pine"><i style="background:linear-gradient(135deg,#1B4332 50%,#F7F3E3 50%);box-shadow:inset 0 0 0 1px rgba(27,67,50,.35)"></i>Хвоя</button>
     </div>
     <div class="label">Поделиться</div>
     <button class="group-card" id="set-share">
