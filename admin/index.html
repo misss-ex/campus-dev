@@ -220,7 +220,7 @@ async function renderStats() {
     ${m.subs.length ? card('Разделы сервисов', hbars(m.subs)) : ''}
     ${card('Функции', hbars(m.features))}
     ${m.resources.length ? card('Ресурсы', hbars(m.resources.slice(0, 8)), 'переходы') : ''}
-    ${card('Группы', hbars(m.groups.slice(0, 10)), 'уникальные люди')}
+    ${card('Группы', hbars(m.groups.slice(0, 10)), 'по основной группе человека')}
     ${card('Факультеты и курсы', hbars(m.faculties))}
     ${card('Как выбирают группу', hbars(m.group_via))}
     ${card('Платформы', hbars(m.platforms, m.opens_n), 'открытия')}
