@@ -400,7 +400,7 @@
 </div></nav>
 
 <script type="module">
-import { Schedule, prefs, moscowNow, formatDayTitle, formatMonth, addDays, mondayOf, studyWeek, toMin, weekday, WEEKDAYS_FULL } from './schedule.js';
+import { Schedule, prefs, moscowNow, formatDayTitle, formatMonth, addDays, mondayOf, studyWeek, semesterFor, semestersOf, toMin, weekday, WEEKDAYS_FULL } from './schedule.js';
 
 const tg = window.Telegram?.WebApp;
 const BOT = 'stgmu_helpbot';
@@ -542,7 +542,10 @@ function renderSchedule() {
   const { iso: todayIso, minutes } = moscowNow();
   const sel = st.selDate || todayIso;
   const week = S.getWeek(st.data, sel);
-  $('sch-sub').textContent = `Учебная неделя ${studyWeek(sel, st.data.semester)}`;
+  const sem = semesterFor(sel, semestersOf(st.data));
+  const out = sel < sem.start || sel > sem.end;
+  $('sch-sub').textContent = out && !week.some(d => d.lessons.length) ? 'Между семестрами'
+    : `${out ? sem.title : 'Учебная неделя ' + studyWeek(sel, sem)}${sem.draft ? ' · проект' : ''}`;
   $('sch-group').textContent = st.group;
   $('sch-month').textContent = formatMonth(sel);
   $('sch-days').innerHTML = week.map(d => `<button class="day num${d.date === sel ? ' sel' : ''}${d.date === todayIso ? ' today' : ''}${d.lessons.length ? '' : ' off'}" data-d="${d.date}"><small>${d.weekday}</small><b>${d.day}</b><span class="dots">${'<i></i>'.repeat(Math.min(d.lessons.length, 4))}</span></button>`).join('');
@@ -566,8 +569,10 @@ const FOLDER_ICON = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none"
 const TG_ICON = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M21 4 3 11l6 2 2 6 3-4 5 4z"/><path d="m9 13 8-6"/></svg>';
 let resources = null;
 // ---------- семестр в цифрах: всё считается из расписания группы, без сервера
-const STATS_END = '2026-12-30';  // последний учебный день для «Семестра в цифрах»; пары позже не считаем
+// «Семестр в цифрах» — по текущему семестру: пары с sem.start по sem.stats_end (последний учебный день)
 function semesterStats(data, today) {
+  const sem = semesterFor(today, semestersOf(data));
+  const STATS_END = sem.stats_end || sem.end;
   const subj = new Map(), days = new Map(), byWd = new Map(), teachers = new Map(), rooms = new Map();
   let total = 0, done = 0, minDone = 0, minAll = 0, lectures = 0, last = '';
   const bump = (m, k) => { if (k) m.set(k, (m.get(k) || 0) + 1); };
@@ -575,7 +580,7 @@ function semesterStats(data, today) {
     const dur = toMin(ev.end) - toMin(ev.start);
     const sj = subj.get(ev.subject) || { n: 0, left: 0, type: ev.type };
     for (const d of ev.dates) {
-      if (d > STATS_END) continue;
+      if (d > STATS_END || d < sem.start) continue;
       total++; sj.n++; if (d > last) last = d;
       minAll += dur; if (ev.type === 'lecture') lectures++; bump(teachers, ev.teacher?.trim()); bump(rooms, ev.room?.trim());
       if (d < today) { done++; minDone += dur; } else sj.left++;
@@ -588,10 +593,9 @@ function semesterStats(data, today) {
   for (const [d, day] of days) { const w = byWd.get(weekday(d)) || { pairs: 0, dates: 0 }; w.pairs += day.n; w.dates++; byWd.set(weekday(d), w); }
   const busiest = [...byWd].sort((a, b) => b[1].pairs / b[1].dates - a[1].pairs / a[1].dates)[0];
   const top = m => [...m].sort((a, b) => b[1] - a[1])[0];
-  const sem = data.semester || S.index.semester;
   const span = (Date.parse(STATS_END) + 864e5 - Date.parse(sem.start)) || 1;
   return {
-    total, done, left: total - done, hoursDone: Math.round(minDone / 60), last, minAll, lectures,
+    sem, total, done, left: total - done, hoursDone: Math.round(minDone / 60), last, minAll, lectures,
     teacher: top(teachers), room: top(rooms),
     pct: Math.max(0, Math.min(100, Math.round((Date.parse(today) - Date.parse(sem.start)) / span * 100))),
     studyDays: days.size, daysLeft: [...days.keys()].filter(d => d >= today).length,
@@ -626,7 +630,7 @@ function renderStats() {
     ].filter(Boolean).map(f => [Math.random(), f]).sort((a, b) => a[0] - b[0]).slice(0, 3).map(f => f[1]);
   }
   $('svc-stats').innerHTML = `
-    <div class="hero"><span class="status"><i class="live"></i>${esc(st.group)} · ${esc(S.index.semester.title)}</span>
+    <div class="hero"><span class="status"><i class="live"></i>${esc(st.group)} · ${esc(x.sem.title)}${x.sem.draft ? ' (проект)' : ''}</span>
       <div class="big-pct num" style="margin-top:14px">${x.pct}%<small>семестра позади</small></div>
       <div class="ptrack"><i style="width:${x.pct}%"></i></div>
       ${x.last ? `<div class="meta">Последняя пара — ${esc(formatDayTitle(x.last).toLowerCase())}</div>` : ''}</div>
@@ -710,7 +714,7 @@ function renderSettings() {
   $('set-share-s').textContent = g ? `Отправить ссылку на ${g.id} одногруппникам` : 'Отправить ссылку одногруппникам';
   $('set-favs').innerHTML = st.favs.map(id => `<span class="fav${id === st.group ? ' sel' : ''}"><button data-fav="${esc(id)}">${esc(id)}</button><button class="x" data-unfav="${esc(id)}" aria-label="Убрать ${esc(id)}">×</button></span>`).join('')
     + (st.favs.length < MAX_FAVS ? `<button class="fav add" data-addfav>+ Добавить</button>` : '');
-  $('set-version').textContent = S.index.semester.title;
+  $('set-version').textContent = semesterFor(moscowNow().iso, S.index.semesters || [S.index.semester]).title;
 }
 $('set-theme').onclick = e => { const b = e.target.closest('[data-v]'); if (!b) return; st.theme = b.dataset.v; track('theme', { v: st.theme }); prefs.set('theme', st.theme); applyTheme(); haptic('sel'); renderSettings(); };
 $('set-accent').onclick = e => { const b = e.target.closest('[data-v]'); if (!b) return; st.accent = b.dataset.v; track('accent', { v: st.accent }); prefs.set('accent', st.accent); applyTheme(); haptic('sel'); renderSettings(); };

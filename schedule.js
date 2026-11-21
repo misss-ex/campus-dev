@@ -61,6 +61,16 @@ export function studyWeek(iso, semester) {
   return Math.floor(days / 7) + 1;
 }
 
+/**
+ * Семестр для даты: тот, в который она попадает; между семестрами — ближайший следующий;
+ * после последнего — последний. list — data.semesters (или [data.semester] для старых данных).
+ */
+export function semesterFor(iso, list) {
+  const sems = [...list].sort((a, b) => a.start.localeCompare(b.start));
+  return sems.find(s => s.start <= iso && iso <= s.end) || sems.find(s => iso < s.start) || sems[sems.length - 1];
+}
+export function semestersOf(data) { return data.semesters?.length ? data.semesters : [data.semester]; }
+
 /** Чётность в терминах расписания: 1 = «1 неделя» (нечётная), 2 = «2 неделя» */
 export function weekParity(iso, semester) { return studyWeek(iso, semester) % 2 === 1 ? 1 : 2; }
 
@@ -206,7 +216,7 @@ export class Schedule {
       progress: current ? (minutes - current.startMin) / (current.endMin - current.startMin) : null,
       minutesToNext: next && next.date === iso ? next.startMin - minutes : null,
       position: current ? { index: current.number, total: today.length } : null,
-      studyWeek: studyWeek(iso, group.semester),
+      studyWeek: studyWeek(iso, semesterFor(iso, semestersOf(group))),
     };
   }
 
