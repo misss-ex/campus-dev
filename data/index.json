@@ -1,6 +1,6 @@
 {
- "version": "202611211526",
- "generated_at": "2026-11-21T15:26:01",
+ "version": "202611231000",
+ "generated_at": "2026-11-23T10:00:08",
  "semester": {
   "id": "2026-fall",
   "title": "1-й семестр 2026/2027",
@@ -2094,189 +2094,189 @@
    "semester": "2027-spring",
    "file": "Проект 2 семестр/Лечебное дело/draft_led_1k1p.json",
    "pdf": "jkdqv2l65krwcsgklk01pl0izq5s8u10.pdf",
-   "reviewed_at": "2026-11-21T12:25:50Z"
+   "reviewed_at": "2026-11-23T06:59:57Z"
   },
   {
    "key": "led-1-2",
    "semester": "2027-spring",
    "file": "Проект 2 семестр/Лечебное дело/draft_led_1k2p.json",
    "pdf": "730msaqvb08f9c9xe2t81nxgru3qwomj.pdf",
-   "reviewed_at": "2026-11-21T12:25:51Z"
+   "reviewed_at": "2026-11-23T06:59:58Z"
   },
   {
    "key": "led-2-1",
    "semester": "2027-spring",
    "file": "Проект 2 семестр/Лечебное дело/draft_led_2k1p.json",
    "pdf": "oe3cszmv7qltdsz62j2no4hgx3woukuw.pdf",
-   "reviewed_at": "2026-11-21T12:25:51Z"
+   "reviewed_at": "2026-11-23T06:59:58Z"
   },
   {
    "key": "led-2-2",
    "semester": "2027-spring",
    "file": "Проект 2 семестр/Лечебное дело/draft_led_2k2p.json",
    "pdf": "ik3rf5axggdbnp90dqt13zk9h1h322gf.pdf",
-   "reviewed_at": "2026-11-21T12:25:52Z"
+   "reviewed_at": "2026-11-23T06:59:59Z"
   },
   {
    "key": "led-3-1",
    "semester": "2027-spring",
    "file": "Проект 2 семестр/Лечебное дело/draft_led_3k1p.json",
    "pdf": "kr6afz79o7r9t2wr2fjrklq6h482tfhg.pdf",
-   "reviewed_at": "2026-11-21T12:25:52Z"
+   "reviewed_at": "2026-11-23T06:59:59Z"
   },
   {
    "key": "led-3-2",
    "semester": "2027-spring",
    "file": "Проект 2 семестр/Лечебное дело/draft_led_3k2p.json",
    "pdf": "t7nade3cwpd72iykajigim6ksw8f8yiy.pdf",
-   "reviewed_at": "2026-11-21T12:25:52Z"
+   "reviewed_at": "2026-11-23T06:59:59Z"
   },
   {
    "key": "led-4-1",
    "semester": "2027-spring",
    "file": "Проект 2 семестр/Лечебное дело/draft_led_4k1p.json",
    "pdf": "5tt3rwcsmdqbxymj2wfrogp0i6fkmczv.pdf + f4c970k84owsas3mmkd0ja12ke46iqlf.pdf",
-   "reviewed_at": "2026-11-21T12:25:53Z"
+   "reviewed_at": "2026-11-23T07:00:00Z"
   },
   {
    "key": "led-4-2",
    "semester": "2027-spring",
    "file": "Проект 2 семестр/Лечебное дело/draft_led_4k2p.json",
    "pdf": "tdcznqdremmciwfky5e0alpike835gu5.pdf + vjt27s61xlrm5jvtk6jf0271e6n0bodw.pdf",
-   "reviewed_at": "2026-11-21T12:25:53Z"
+   "reviewed_at": "2026-11-23T07:00:00Z"
   },
   {
    "key": "led-5-1",
    "semester": "2027-spring",
    "file": "Проект 2 семестр/Лечебное дело/draft_led_5k1p.json",
    "pdf": "22kj2t3ohggb8isv7lgrnn9ikafobiu3.pdf + 9r5xqp9zgxs2nhl39gmc3lm6h7h5r18n.pdf",
-   "reviewed_at": "2026-11-21T12:25:53Z"
+   "reviewed_at": "2026-11-23T07:00:00Z"
   },
   {
    "key": "led-5-2",
    "semester": "2027-spring",
    "file": "Проект 2 семестр/Лечебное дело/draft_led_5k2p.json",
    "pdf": "l4c89f43ve2gelk8juhj270hrlm8gzag.pdf + uo4us37sdnagxtlmn0wgyp8c9wapz7yn.pdf",
-   "reviewed_at": "2026-11-21T12:25:53Z"
+   "reviewed_at": "2026-11-23T07:00:00Z"
   },
   {
    "key": "led-6-1",
    "semester": "2027-spring",
    "file": "Проект 2 семестр/Лечебное дело/draft_led_6k1p.json",
    "pdf": "vt5j9g2eg8ivnud3eydma1c40cgqdjq1.pdf + 8uolzlxngfpx2avklyftd4wq1bphqba0.pdf",
-   "reviewed_at": "2026-11-21T12:25:54Z"
+   "reviewed_at": "2026-11-23T07:00:01Z"
   },
   {
    "key": "led-6-2",
    "semester": "2027-spring",
    "file": "Проект 2 семестр/Лечебное дело/draft_led_6k2p.json",
    "pdf": "29qcwc6hrs0o5mxnjjmedfz6j91yn7sc.pdf + 0wptpfgfr4lxvr6uwujc5ts66qivlx17.pdf",
-   "reviewed_at": "2026-11-21T12:25:56Z"
+   "reviewed_at": "2026-11-23T07:00:03Z"
   },
   {
    "key": "ped-1",
    "semester": "2027-spring",
    "file": "Проект 2 семестр/Педиатрия/draft_ped_1k.json",
    "pdf": "of2z23fl2zga8vnytlsq7crolu4zpnzk.pdf",
-   "reviewed_at": "2026-11-21T12:25:56Z"
+   "reviewed_at": "2026-11-23T07:00:03Z"
   },
   {
    "key": "ped-2",
    "semester": "2027-spring",
    "file": "Проект 2 семестр/Педиатрия/draft_ped_2k.json",
    "pdf": "cuhkfzjaye57qa7ei7hol1a2qnkzmgdm.pdf",
-   "reviewed_at": "2026-11-21T12:25:56Z"
+   "reviewed_at": "2026-11-23T07:00:03Z"
   },
   {
    "key": "ped-3",
    "semester": "2027-spring",
    "file": "Проект 2 семестр/Педиатрия/draft_ped_3k.json",
    "pdf": "2f05oa3dvunjuwoq1j4mc958qvx7fia6.pdf",
-   "reviewed_at": "2026-11-21T12:25:57Z"
+   "reviewed_at": "2026-11-23T07:00:04Z"
   },
   {
    "key": "ped-4",
    "semester": "2027-spring",
    "file": "Проект 2 семестр/Педиатрия/draft_ped_4k.json",
    "pdf": "8pmxm9c4aymld2caslgq2a3kijf2lrey.pdf + z1di7cikmk7qm9109jb3lhyewvd08ju2.pdf",
-   "reviewed_at": "2026-11-21T12:25:57Z"
+   "reviewed_at": "2026-11-23T07:00:04Z"
   },
   {
    "key": "ped-5",
    "semester": "2027-spring",
    "file": "Проект 2 семестр/Педиатрия/draft_ped_5k.json",
    "pdf": "dc8qa7b7gax43ptm5j69hijls8drzvze.pdf + t9hwf59z76glm514ux2p39iaicmlrpt1.pdf",
-   "reviewed_at": "2026-11-21T12:25:57Z"
+   "reviewed_at": "2026-11-23T07:00:04Z"
   },
   {
    "key": "ped-6-1",
    "semester": "2027-spring",
    "file": "Проект 2 семестр/Педиатрия/draft_ped_6k1p.json",
    "pdf": "fo2g8p1bi3qdk4hbili1y118gidr70ib.pdf + 3mbaqwh7nwfijzjqvycxh3v5trke3hhs.pdf",
-   "reviewed_at": "2026-11-21T12:25:58Z"
+   "reviewed_at": "2026-11-23T07:00:05Z"
   },
   {
    "key": "ped-6-2",
    "semester": "2027-spring",
    "file": "Проект 2 семестр/Педиатрия/draft_ped_6k2p.json",
    "pdf": "tqlfk0oqv2rgscskhiniyw4thmed304r.pdf + hvjo1dj9drq0aoy35nkq9syn6h5jkb1o.pdf",
-   "reviewed_at": "2026-11-21T12:25:58Z"
+   "reviewed_at": "2026-11-23T07:00:05Z"
   },
   {
    "key": "stom-1-1",
    "semester": "2027-spring",
    "file": "Проект 2 семестр/Стоматология/draft_stom_1k1p.json",
    "pdf": "ni3heh65ojhplrkhh5wi2bscz618n00w.pdf",
-   "reviewed_at": "2026-11-21T12:25:58Z"
+   "reviewed_at": "2026-11-23T07:00:05Z"
   },
   {
    "key": "stom-1-2",
    "semester": "2027-spring",
    "file": "Проект 2 семестр/Стоматология/draft_stom_1k2p.json",
    "pdf": "x875bwgl49o9gsr5pwpjcogz90lb963s.pdf",
-   "reviewed_at": "2026-11-21T12:25:58Z"
+   "reviewed_at": "2026-11-23T07:00:06Z"
   },
   {
    "key": "stom-2-1",
    "semester": "2027-spring",
    "file": "Проект 2 семестр/Стоматология/draft_stom_2k1p.json",
    "pdf": "xwuihljv41g70jzrocphpr5g8xiznuum.pdf",
-   "reviewed_at": "2026-11-21T12:25:59Z"
+   "reviewed_at": "2026-11-23T07:00:06Z"
   },
   {
    "key": "stom-2-2",
    "semester": "2027-spring",
    "file": "Проект 2 семестр/Стоматология/draft_stom_2k2p.json",
    "pdf": "o5a68q9olywx70torcf99trlrhypddvd.pdf",
-   "reviewed_at": "2026-11-21T12:25:59Z"
+   "reviewed_at": "2026-11-23T07:00:06Z"
   },
   {
    "key": "stom-3-1",
    "semester": "2027-spring",
    "file": "Проект 2 семестр/Стоматология/draft_stom_3k1p.json",
    "pdf": "9nq7m0sdt6knxmijzgdk7nrrrliy44e7.pdf",
-   "reviewed_at": "2026-11-21T12:25:59Z"
+   "reviewed_at": "2026-11-23T07:00:07Z"
   },
   {
    "key": "stom-3-2",
    "semester": "2027-spring",
    "file": "Проект 2 семестр/Стоматология/draft_stom_3k2p.json",
    "pdf": "atfjkgbme61ix4egrpa8wnyg7iutryyj.pdf",
-   "reviewed_at": "2026-11-21T12:26:00Z"
+   "reviewed_at": "2026-11-23T07:00:07Z"
   },
   {
    "key": "stom-4",
    "semester": "2027-spring",
    "file": "Проект 2 семестр/Стоматология/draft_stom_4k.json",
    "pdf": "23htwz87glrbqy5jw5eedic5aj0g7iqk.pdf",
-   "reviewed_at": "2026-11-21T12:26:00Z"
+   "reviewed_at": "2026-11-23T07:00:07Z"
   },
   {
    "key": "stom-5",
    "semester": "2027-spring",
    "file": "Проект 2 семестр/Стоматология/draft_stom_5k.json",
    "pdf": "mhi1ddbb3ihwty0r83rwa7qbwbmvipot.pdf",
-   "reviewed_at": "2026-11-21T12:26:00Z"
+   "reviewed_at": "2026-11-23T07:00:08Z"
   }
  ]
 }
